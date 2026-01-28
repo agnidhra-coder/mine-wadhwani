@@ -9,9 +9,6 @@ connectDB()
     app.listen(process.env.PORT || 1425, () => {
       console.log(`⚙️ Server is running on port ${process.env.PORT}`);
     });
-    app.get("/", (req, res) => {
-      res.json({ message: "Welcome to the API" });
-    });
   })
   .catch((e) => {
     console.log("DB connection error", e);
