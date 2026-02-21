@@ -24,17 +24,28 @@ migrate_working_dir/
 #.vscode/
 
 # Auto-generated code (auto_route, build_runner)
+*.g.dart
 *.gr.dart
+*.freezed.dart
 
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+.dart_tools/
+.flutter-plugins
 .flutter-plugins-dependencies
+.packages
 .pub-cache/
 .pub/
-/build/
+**/build/
 /coverage/
+
+# Platform ephemeral directories
+**/ios/Flutter/ephemeral/
+**/linux/flutter/ephemeral/
+**/macos/Flutter/ephemeral/
+**/windows/flutter/ephemeral/
 
 # Symbolication related
 app.*.symbols

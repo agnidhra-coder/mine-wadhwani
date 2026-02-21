@@ -19,7 +19,7 @@ class UserModel extends UserEntity {
       email: json['email'] as String,
       mobilenumber: json['mobilenumber'] as String,
       avatar: json['avatar'] as String? ?? 'default-avatar-url.jpg',
-      role: json['role'] as String? ?? 'SUPERVISOR',
+      role: json['role'] as String? ?? '',
       mineid: json['mineid'] as String?,
       token: token ?? '',
     );
