@@ -1,11 +1,11 @@
 import { Router } from "express";
 const userrouter = Router();
-import { LoginUser, RegisterUser } from "../Controller/auth.controller.js";
-import { auth_middleware } from "../Middleware/auth.middleware.js";
+import { LoginUser, RegisterUser } from "../../Controller/auth.controller.js";
+import { auth_middleware } from "../../Middleware/auth.middleware.js";
 import {
   requireSuperAdmin,
   requireAdmin,
-} from "../Middleware/role.middleware.js";
+} from "../../Middleware/role.middleware.js";
 userrouter.route("/register").post(RegisterUser);
 userrouter.route("/login").post(LoginUser);
 userrouter.route("/profile").post(auth_middleware, (req, res) => {

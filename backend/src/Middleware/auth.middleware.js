@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import ApiResponse from "../Utils/ApiResponse.js";
+import ApiResponse from "../Utils/Apiresponse.js";
 import { UserModel } from "../Models/user.model.js";
 const auth_middleware = async (req, res, next) => {
   try {
@@ -14,6 +14,7 @@ const auth_middleware = async (req, res, next) => {
     }
     console.log(token);
     if (!token) {
+      console.log("token nahi aaya hai");
       return res
         .status(500)
         .json(ApiResponse.error(`No authorization token provided`, 500));
