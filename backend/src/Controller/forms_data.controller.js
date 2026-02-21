@@ -46,10 +46,13 @@ const save_data = async (req, res) => {
       return res
         .status(400)
         .json(
-          ApiResponse.error(`All required fields are not provided in the request body`, 400),
+          ApiResponse.error(
+            `All required fields are not provided in the request body`,
+            400,
+          ),
         );
     }
-    const karo =await QuestionModel.create({
+    const karo = await QuestionModel.create({
       mineId,
       operationalDate,
       shiftNumber,
