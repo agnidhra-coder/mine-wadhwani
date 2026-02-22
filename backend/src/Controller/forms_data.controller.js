@@ -8,7 +8,7 @@ const get_form_data = (req, res) => {
       .json(
         ApiResponse.success(
           questions,
-          "Questins data fetched successfully",
+        "Questions data fetched successfully",
           201,
         ),
       );

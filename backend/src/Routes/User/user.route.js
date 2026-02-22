@@ -15,7 +15,7 @@ userrouter.route("/profile").post(auth_middleware, (req, res) => {
   });
 });
 userrouter
-  .route("/super_admin")
+  .route("/super-admin")
   .post(auth_middleware, requireSuperAdmin, (req, res) => {
     return res.status(200).json({
       message: "Hello from superadmin",
