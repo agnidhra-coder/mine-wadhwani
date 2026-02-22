@@ -1,4 +1,3 @@
-import 'package:mine_wadhwani/core/constants/api_constants.dart';
 import 'package:mine_wadhwani/core/error/exceptions.dart';
 import 'package:mine_wadhwani/core/network/api_client.dart';
 import 'package:mine_wadhwani/data/models/auth/auth_response_model.dart';
@@ -30,7 +29,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }) async {
     try {
       final response = await apiClient.post(
-        ApiConstants.loginEndpoint,
+        '/api/v1/auth/login',
         data: {'email': email, 'password': password},
       );
 
@@ -53,7 +52,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }) async {
     try {
       final response = await apiClient.post(
-        ApiConstants.registerEndpoint,
+        '/api/v1/auth/register',
         data: {
           'name': name,
           'email': email,

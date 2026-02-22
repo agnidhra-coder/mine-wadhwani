@@ -7,6 +7,7 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
+      fontFamily: 'SFProDisplay',
       colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
       visualDensity: VisualDensity.standard,
       appBarTheme: const AppBarTheme(
