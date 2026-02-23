@@ -15,14 +15,24 @@ const RegisterUser = async (req, res) => {
     }
 
     // Check if user already exists
+    const email_user = await UserModel.findOne({
+      $or: [{ email }],
+    });
+
+    if (email_user) {
+      return res
+        .status(409)
+        .json(ApiResponse.error("User email already exists, please login", 409));
+    }
+
     const user = await UserModel.findOne({
-      $or: [{ email }, { mobilenumber }],
+      $or: [{ mobilenumber }],
     });
 
     if (user) {
       return res
         .status(409)
-        .json(ApiResponse.error("User already exists, please login", 409));
+        .json(ApiResponse.error("User mobile number already exists, please login", 409));
     }
 
     // Hash password
