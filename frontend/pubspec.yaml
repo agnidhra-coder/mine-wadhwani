@@ -17,6 +17,8 @@ dependencies:
 
   # Networking
   dio: ^5.7.0
+  talker: ^4.5.2
+  talker_dio_logger: ^4.5.2
 
   # Dependency Injection
   get_it: ^8.0.3
@@ -39,6 +41,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/json/
 
   fonts:
     - family: SFProDisplay

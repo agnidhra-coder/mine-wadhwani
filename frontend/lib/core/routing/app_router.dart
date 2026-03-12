@@ -18,6 +18,16 @@ class AppRouter extends RootStackRouter {
           initial: true,
           guards: [authGuard],
         ),
+        AutoRoute(
+          page: ChecklistRoute.page,
+          path: '/checklist',
+          guards: [authGuard],
+        ),
+        AutoRoute(
+          page: HazardDatabaseRoute.page,
+          path: '/hazard-database',
+          guards: [authGuard],
+        ),
       ];
 
   @override

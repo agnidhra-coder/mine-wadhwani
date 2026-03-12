@@ -23,16 +23,41 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _emailFocus = FocusNode();
+  final _passwordFocus = FocusNode();
   bool _obscurePassword = true;
+  String? _emailError;
+  String? _passwordError;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailFocus.addListener(() {
+      if (!_emailFocus.hasFocus && _emailError != null) {
+        setState(() => _emailError = null);
+      }
+    });
+    _passwordFocus.addListener(() {
+      if (!_passwordFocus.hasFocus && _passwordError != null) {
+        setState(() => _passwordError = null);
+      }
+    });
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
     super.dispose();
   }
 
   void _onLogin() {
+    setState(() {
+      _emailError = null;
+      _passwordError = null;
+    });
     if (_formKey.currentState?.validate() ?? false) {
       context.read<AuthBloc>().add(
             AuthLoginRequested(
@@ -49,12 +74,20 @@ class _LoginPageState extends State<LoginPage> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Theme.of(context).colorScheme.error,
-              ),
-            );
+            _passwordController.clear();
+            final msg = state.message.toLowerCase();
+            if (msg.contains('not exist') || msg.contains('not found')) {
+              setState(() => _emailError = state.message);
+            } else if (msg.contains('invalid password')) {
+              setState(() => _passwordError = state.message);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+              );
+            }
           } else if (state is Authenticated) {
             context.router.replaceAll([const HomeRoute()]);
           }
@@ -97,8 +130,10 @@ class _LoginPageState extends State<LoginPage> {
                             label: 'Email',
                             hint: 'Enter your email',
                             controller: _emailController,
+                            focusNode: _emailFocus,
                             keyboardType: TextInputType.emailAddress,
                             prefixIcon: const Icon(Icons.email_outlined),
+                            errorText: _emailError,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
                                 return 'Email is required';
@@ -115,13 +150,15 @@ class _LoginPageState extends State<LoginPage> {
                             label: 'Password',
                             hint: 'Enter your password',
                             controller: _passwordController,
+                            focusNode: _passwordFocus,
                             obscureText: _obscurePassword,
                             prefixIcon: const Icon(Icons.lock_outlined),
+                            errorText: _passwordError,
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined,
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
                               ),
                               onPressed: () {
                                 setState(() {

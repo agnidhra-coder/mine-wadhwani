@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mine_wadhwani/core/constants/app_constants.dart';
 import 'package:mine_wadhwani/core/routing/app_router.gr.dart';
 import 'package:mine_wadhwani/core/theme/app_text_styles.dart';
 import 'package:mine_wadhwani/core/widgets/custom_text_field.dart';
@@ -143,6 +142,8 @@ class _SignupPageState extends State<SignupPage> {
                             controller: _mobileController,
                             keyboardType: TextInputType.phone,
                             prefixIcon: const Icon(Icons.phone_outlined),
+                            prefixText: '+91 ',
+                            maxLength: 10,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
                                 return 'Mobile number is required';
@@ -163,8 +164,8 @@ class _SignupPageState extends State<SignupPage> {
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined,
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -177,14 +178,17 @@ class _SignupPageState extends State<SignupPage> {
                                 return 'Password is required';
                               }
                               if (value.length <
-                                  AppConstants.minPasswordLength) {
-                                return 'Password must be at least ${AppConstants.minPasswordLength} characters';
+                                  6) {
+                                return 'Password must be at least 6 characters';
                               }
                               if (!RegExp(r'[A-Z]').hasMatch(value)) {
                                 return 'Password must contain at least one uppercase letter';
                               }
                               if (!RegExp(r'[0-9]').hasMatch(value)) {
                                 return 'Password must contain at least one number';
+                              }
+                              if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                                return 'Password must contain at least 1 special character';
                               }
                               return null;
                             },
@@ -199,8 +203,8 @@ class _SignupPageState extends State<SignupPage> {
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscureConfirmPassword
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined,
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
                               ),
                               onPressed: () {
                                 setState(() {

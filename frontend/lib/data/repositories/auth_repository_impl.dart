@@ -73,10 +73,9 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, UserEntity>> getCachedUser() async {
     try {
       final user = await localDataSource.getCachedUser();
-      if (user == null) {
-        return const Left(CacheFailure(message: 'No cached user found'));
-      }
-      return Right(user);
+      return user != null
+          ? Right(user)
+          : const Left(CacheFailure(message: 'No cached user found'));
     } on CacheException catch (e) {
       return Left(CacheFailure(message: e.message));
     }
