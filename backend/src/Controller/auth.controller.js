@@ -147,4 +147,73 @@ const LoginUser = async (req, res) => {
   }
 };
 
-export { RegisterUser, LoginUser };
+const AdminLoginUser = async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json(ApiResponse.error("Username and password are required", 400));
+    }
+
+    // Find user by email (username)
+    const user = await UserModel.findOne({ email: username });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json(
+          ApiResponse.error("Admin account does not exist", 404),
+        );
+    }
+
+    // Check if user has admin role
+    if (user.role !== "SUPER_ADMIN" && user.role !== "MINE_ADMIN") {
+      return res
+        .status(403)
+        .json(
+          ApiResponse.error("Access denied. Admin privileges required", 403),
+        );
+    }
+
+    // Check password
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordCorrect) {
+      return res.status(401).json(ApiResponse.error("Invalid password", 401));
+    }
+
+    // Generate JWT token
+    const jwtToken = jwt.sign(
+      { email: user.email, _id: user._id },
+      process.env.Authentication_for_jsonwebtoken,
+      { expiresIn: "24h" },
+    );
+
+    // Remove password from user object
+    const userWithoutPassword = await UserModel.findById(user._id).select(
+      "-password",
+    );
+
+    const responseData = {
+      user: userWithoutPassword,
+      token: jwtToken,
+    };
+
+    return res
+      .status(200)
+      .json(
+        ApiResponse.success(responseData, "Admin logged in successfully", 200),
+      );
+  } catch (error) {
+    console.error("Admin login error:", error);
+    return res
+      .status(500)
+      .json(
+        ApiResponse.error(`Error in admin login: ${error.message}`, 500),
+      );
+  }
+};
+
+export { RegisterUser, LoginUser, AdminLoginUser };

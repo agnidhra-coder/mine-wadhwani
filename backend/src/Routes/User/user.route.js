@@ -1,6 +1,6 @@
 import { Router } from "express";
 const userrouter = Router();
-import { LoginUser, RegisterUser } from "../../Controller/auth.controller.js";
+import { LoginUser, RegisterUser, AdminLoginUser } from "../../Controller/auth.controller.js";
 import { auth_middleware } from "../../Middleware/auth.middleware.js";
 import {
   requireSuperAdmin,
@@ -8,6 +8,7 @@ import {
 } from "../../Middleware/role.middleware.js";
 userrouter.route("/register").post(RegisterUser);
 userrouter.route("/login").post(LoginUser);
+userrouter.route("/admin-login").post(AdminLoginUser);
 userrouter.route("/profile").post(auth_middleware, (req, res) => {
   return res.status(200).json({
     message: "user is verified",

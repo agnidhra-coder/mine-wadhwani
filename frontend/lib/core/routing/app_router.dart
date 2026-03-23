@@ -19,14 +19,37 @@ class AppRouter extends RootStackRouter {
           guards: [authGuard],
         ),
         AutoRoute(
+          page: ChecklistOverviewRoute.page,
+          path: '/checklist-overview',
+          guards: [authGuard],
+        ),
+        AutoRoute(
           page: ChecklistRoute.page,
           path: '/checklist',
+          guards: [authGuard],
+        ),
+        AutoRoute(
+          page: HazardDatabaseOverviewRoute.page,
+          path: '/hazard-database-overview',
           guards: [authGuard],
         ),
         AutoRoute(
           page: HazardDatabaseRoute.page,
           path: '/hazard-database',
           guards: [authGuard],
+        ),
+        AutoRoute(page: AdminLoginRoute.page, path: '/admin-login'),
+        AutoRoute(
+          page: AdminDashboardRoute.page,
+          path: '/admin-dashboard',
+        ),
+        AutoRoute(
+          page: AdminUsersRoute.page,
+          path: '/admin-users',
+        ),
+        AutoRoute(
+          page: AdminReportsRoute.page,
+          path: '/admin-reports',
         ),
       ];
 

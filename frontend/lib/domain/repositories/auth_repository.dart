@@ -15,6 +15,11 @@ abstract class AuthRepository {
     required String mobilenumber,
   });
 
+  Future<Either<Failure, UserEntity>> adminLogin({
+    required String username,
+    required String password,
+  });
+
   Future<Either<Failure, bool>> isLoggedIn();
 
   Future<Either<Failure, UserEntity>> getCachedUser();

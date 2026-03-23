@@ -60,6 +60,26 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, UserEntity>> adminLogin({
+    required String username,
+    required String password,
+  }) async {
+    try {
+      final user = await remoteDataSource.adminLogin(
+        username: username,
+        password: password,
+      );
+      await localDataSource.cacheToken(user.token);
+      await localDataSource.cacheUser(user);
+      return Right(user);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on CacheException catch (e) {
+      return Left(CacheFailure(message: e.message));
+    }
+  }
+
+  @override
   Future<Either<Failure, bool>> isLoggedIn() async {
     try {
       final hasToken = await localDataSource.hasToken();

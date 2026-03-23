@@ -31,6 +31,7 @@ dependencies:
 
   # Functional Error Handling
   dartz: ^0.10.1
+  fl_chart: ^1.2.0
 
 dev_dependencies:
   flutter_test:

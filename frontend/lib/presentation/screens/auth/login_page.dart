@@ -204,6 +204,21 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                           ),
+                          const SizedBox(height: 16),
+                          Center(
+                            child: GestureDetector(
+                              onTap: () {
+                                context.router
+                                    .push(const AdminLoginRoute());
+                              },
+                              child: Text(
+                                'Admin Login',
+                                style: AppTextStyles.labelLarge.copyWith(
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),

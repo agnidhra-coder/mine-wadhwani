@@ -43,7 +43,7 @@ class HomePage extends StatelessWidget {
                 const SizedBox(height: 32),
                 FilledButton.icon(
                   onPressed: () {
-                    context.router.push(const ChecklistRoute());
+                    context.router.push(const ChecklistOverviewRoute());
                   },
                   icon: const Icon(Icons.checklist),
                   label: const Text('Start Compliance Checklist'),
@@ -51,7 +51,7 @@ class HomePage extends StatelessWidget {
                 const SizedBox(height: 16),
                 FilledButton.icon(
                   onPressed: () {
-                    context.router.push(const HazardDatabaseRoute());
+                    context.router.push(const HazardDatabaseOverviewRoute());
                   },
                   icon: const Icon(Icons.warning_amber),
                   label: const Text('Hazard Database'),

@@ -36,7 +36,11 @@ class _AppState extends State<App> {
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is Unauthenticated) {
-            _appRouter.replaceAll([const LoginRoute()]);
+            final currentPath =
+                _appRouter.urlState.path;
+            if (currentPath != '/admin-login') {
+              _appRouter.replaceAll([const LoginRoute()]);
+            }
           }
         },
         child: MaterialApp.router(

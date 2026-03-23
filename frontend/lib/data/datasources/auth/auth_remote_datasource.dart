@@ -15,6 +15,11 @@ abstract class AuthRemoteDataSource {
     required String password,
     required String mobilenumber,
   });
+
+  Future<UserModel> adminLogin({
+    required String username,
+    required String password,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -70,6 +75,28 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw ServerException(message: 'Failed to register: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<UserModel> adminLogin({
+    required String username,
+    required String password,
+  }) async {
+    try {
+      final response = await apiClient.request(
+        path: '/api/v1/auth/admin-login',
+        method: HttpMethod.post,
+        data: {'username': username, 'password': password},
+      );
+
+      final authResponse =
+          AuthResponseModel.fromJson(response.data as Map<String, dynamic>);
+      return authResponse.user;
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: 'Failed to login: ${e.toString()}');
     }
   }
 }

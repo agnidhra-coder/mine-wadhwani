@@ -1,11 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mine_wadhwani/core/usecases/usecase.dart';
+import 'package:mine_wadhwani/domain/entities/auth/user_entity.dart';
 import 'package:mine_wadhwani/domain/usecases/auth_usecases.dart';
 import 'package:mine_wadhwani/presentation/bloc/auth_bloc/auth_event.dart';
 import 'package:mine_wadhwani/presentation/bloc/auth_bloc/auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase loginUseCase;
+  final AdminLoginUseCase adminLoginUseCase;
   final RegisterUseCase registerUseCase;
   final CheckAuthUseCase checkAuthUseCase;
   final LogoutUseCase logoutUseCase;
@@ -13,6 +15,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   AuthBloc({
     required this.loginUseCase,
+    required this.adminLoginUseCase,
     required this.registerUseCase,
     required this.checkAuthUseCase,
     required this.logoutUseCase,
@@ -20,6 +23,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }) : super(const AuthInitial()) {
     on<AuthCheckRequested>(_onCheckAuth);
     on<AuthLoginRequested>(_onLogin);
+    on<AdminLoginRequested>(_onAdminLogin);
     on<AuthRegisterRequested>(_onRegister);
     on<AuthLogoutRequested>(_onLogout);
   }
@@ -57,6 +61,41 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => emit(AuthError(message: failure.message)),
       (user) => emit(Authenticated(user: user)),
+    );
+  }
+
+  // Dummy admin credentials for development
+  static const _dummyAdminUsername = 'admin';
+  static const _dummyAdminPassword = 'admin123';
+
+  Future<void> _onAdminLogin(
+    AdminLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthLoading());
+
+    // TODO: Remove dummy login before production
+    if (event.username == _dummyAdminUsername &&
+        event.password == _dummyAdminPassword) {
+      const dummyAdmin = UserEntity(
+        id: 'dummy-admin-id',
+        name: 'Admin',
+        email: 'admin@wadhwani.com',
+        mobilenumber: '0000000000',
+        avatar: 'default-avatar-url.jpg',
+        role: 'SUPER_ADMIN',
+        token: 'dummy-token',
+      );
+      emit(const AdminAuthenticated(user: dummyAdmin));
+      return;
+    }
+
+    final result = await adminLoginUseCase(
+      AdminLoginParams(username: event.username, password: event.password),
+    );
+    result.fold(
+      (failure) => emit(AuthError(message: failure.message)),
+      (user) => emit(AdminAuthenticated(user: user)),
     );
   }
 

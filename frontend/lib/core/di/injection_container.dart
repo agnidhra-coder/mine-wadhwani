@@ -54,6 +54,7 @@ Future<void> init() async {
   // Use Cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => RegisterUseCase(sl()));
+  sl.registerLazySingleton(() => AdminLoginUseCase(sl()));
   sl.registerLazySingleton(() => CheckAuthUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
   sl.registerLazySingleton(() => GetCachedUserUseCase(sl()));
@@ -64,6 +65,7 @@ Future<void> init() async {
   sl.registerFactory(
     () => AuthBloc(
       loginUseCase: sl(),
+      adminLoginUseCase: sl(),
       registerUseCase: sl(),
       checkAuthUseCase: sl(),
       logoutUseCase: sl(),

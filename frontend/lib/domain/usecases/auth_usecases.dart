@@ -56,6 +56,29 @@ class RegisterUseCase extends UseCase<UserEntity, RegisterParams> {
   }
 }
 
+// Admin Login
+
+class AdminLoginParams {
+  final String username;
+  final String password;
+
+  const AdminLoginParams({required this.username, required this.password});
+}
+
+class AdminLoginUseCase extends UseCase<UserEntity, AdminLoginParams> {
+  final AuthRepository repository;
+
+  AdminLoginUseCase(this.repository);
+
+  @override
+  Future<Either<Failure, UserEntity>> call(AdminLoginParams params) {
+    return repository.adminLogin(
+      username: params.username,
+      password: params.password,
+    );
+  }
+}
+
 // Check Auth
 
 class CheckAuthUseCase extends UseCase<bool, NoParams> {
