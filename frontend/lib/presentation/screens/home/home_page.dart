@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mine_wadhwani/core/routing/app_router.gr.dart';
 import 'package:mine_wadhwani/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:mine_wadhwani/presentation/bloc/auth_bloc/auth_event.dart';
 import 'package:mine_wadhwani/presentation/bloc/auth_bloc/auth_state.dart';
@@ -170,8 +171,13 @@ class _HomePageState extends State<HomePage> {
                           mainAxisSpacing: 16,
                           childAspectRatio: 1.5,
                         ),
-                        itemBuilder: (context, index) =>
-                            _buildDashboardCard(_cards[index]),
+                        itemBuilder: (context, index) => _buildDashboardCard(
+                          _cards[index],
+                          onTap: index == 0
+                              ? () => context.router
+                                  .push(const MineSelectionRoute())
+                              : null,
+                        ),
                       ),
                     ],
                   ),
@@ -333,7 +339,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildDashboardCard(_DashboardCard card) {
+  Widget _buildDashboardCard(
+    _DashboardCard card, {
+    VoidCallback? onTap,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -347,62 +356,69 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      child: Stack(
-        children: [
-          // Left accent bar
-          Positioned(
-            left: 0,
-            top: 0,
-            bottom: 0,
-            child: Container(
-              width: 4,
-              decoration: BoxDecoration(
-                color: card.accentColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  bottomLeft: Radius.circular(10),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onTap,
+          child: Stack(
+            children: [
+              // Left accent bar
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                child: Container(
+                  width: 4,
+                  decoration: BoxDecoration(
+                    color: card.accentColor,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      bottomLeft: Radius.circular(10),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
 
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: card.iconBgColor,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child:
-                      Icon(card.icon, color: card.iconColor, size: 26),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: card.iconBgColor,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(card.icon,
+                          color: card.iconColor, size: 26),
+                    ),
+                    const Spacer(),
+                    Text(
+                      card.title,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1A1A2E),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      card.description,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
                 ),
-                const Spacer(),
-                Text(
-                  card.title,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A1A2E),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  card.description,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
