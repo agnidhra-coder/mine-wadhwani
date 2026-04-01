@@ -1,22 +1,29 @@
 import mongoose, { mongo } from "mongoose";
 const Question_schema = new mongoose.Schema(
   {
-    // mineId: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Mine",
-    //   // required: true,
-    // },
-    // operationalDate: {
-    //   type: Date,
-    //   // required: true,
-    // },
-    // shiftNumber: {
-    //   type: Number,
-    //   // required: true,
-    //   enum: [1, 2, 3],
-    //   initial: -1,
-    // },
-    supervisorId: {
+    mine_name: {
+      type: String,
+      required: true,
+    },
+    mine_type: {
+      type: String,
+      required: true,
+      enum: ["Opencast", "Underground", "Coal", "Metal"],
+    },
+    area: {
+      type: String,
+      required: true,
+    },
+    shift: {
+      type: Number,
+      enum: [1, 2, 3],
+      initial: -1,
+    },
+    Inspection_type: {
+      type: String,
+      required: true,
+    },
+    Inspector_id:{
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -34,10 +41,10 @@ const Question_schema = new mongoose.Schema(
         comment: String,
       },
     ],
-    // startTime: {
-    //   type: Date,
-    //   // required: true,
-    // },
+    startTime: {
+      type: Date,
+      required: true,
+    },
   },
   {
     timestamps: true,
