@@ -16,8 +16,8 @@ const auth_middleware = async (req, res, next) => {
     if (!token) {
       console.log("token nahi aaya hai");
       return res
-        .status(500)
-        .json(ApiResponse.error(`No authorization token provided`, 500));
+        .status(401)
+        .json(ApiResponse.error(`No authorization token provided`, 401));
     }
     const decoded = jwt.verify(
       token,
