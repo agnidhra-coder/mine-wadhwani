@@ -461,11 +461,6 @@ const questions = [
     answer: "",
     comment: "",
   },
-
-  /* ===============================
-   PART 8 – SECURITY
-  ================================ */
-
   {
     question_code: "8.1",
     main_topic: "Security",
