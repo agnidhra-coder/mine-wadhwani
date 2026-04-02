@@ -23,7 +23,7 @@ const Question_schema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    Inspector_id:{
+    Inspector_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
