@@ -28,9 +28,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
   }) async {
     try {
-      final response = await apiClient.request(
-        path: '/api/v1/auth/login',
-        method: HttpMethod.post,
+      final response = await apiClient.post(
+        '/api/v1/auth/login',
         data: {'email': email, 'password': password},
       );
 
@@ -52,9 +51,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String mobilenumber,
   }) async {
     try {
-      final response = await apiClient.request(
-        path: '/api/v1/auth/register',
-        method: HttpMethod.post,
+      final response = await apiClient.post(
+        '/api/v1/auth/register',
         data: {
           'name': name,
           'email': email,
