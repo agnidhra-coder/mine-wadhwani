@@ -12,7 +12,7 @@ class AuthHeader extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.primary, AppColors.primaryContainer],
+          colors: [AppColors.primary, Color(0xFF333333)],
         ),
       ),
       child: Center(

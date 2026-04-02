@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mine_wadhwani/core/theme/app_colors.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String label;
@@ -21,11 +22,20 @@ class PrimaryButton extends StatelessWidget {
       height: 56,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.onPrimary,
+          elevation: 0,
+        ),
+        
         child: isLoading
             ? const SizedBox(
                 height: 24,
                 width: 24,
-                child: CircularProgressIndicator(strokeWidth: 2.5),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: Colors.white,
+                ),
               )
             : Text(label),
       ),
