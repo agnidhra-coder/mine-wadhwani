@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:mine_wadhwani/core/routing/app_router.gr.dart';
 
 @RoutePage()
 class ShiftSelectionPage extends StatefulWidget {
@@ -181,8 +182,7 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
                     child: ElevatedButton(
                       onPressed: _canProceed
                           ? () {
-                              // Navigate to inspection checklist screen
-                              // context.router.push(InspectionChecklistRoute(...))
+                              context.router.push(const ChecklistRoute());
                             }
                           : null,
                       style: ElevatedButton.styleFrom(
@@ -226,7 +226,7 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
       elevation: 0,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_rounded),
-        onPressed: () => Navigator.of(context).maybePop(),
+        onPressed: () => context.router.maybePop(),
       ),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

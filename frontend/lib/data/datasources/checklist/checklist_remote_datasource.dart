@@ -18,9 +18,8 @@ class ChecklistRemoteDataSourceImpl implements ChecklistRemoteDataSource {
   @override
   Future<List<ChecklistModel>> fetchChecklist() async {
     try {
-      final response = await apiClient.request(
-        path: '/api/v1/forms-data/get-form-data',
-        method: HttpMethod.get,
+      final response = await apiClient.get(
+        '/api/v1/forms-data/get-form-data',
       );
 
       final responseData = response.data as Map<String, dynamic>;
@@ -43,9 +42,8 @@ class ChecklistRemoteDataSourceImpl implements ChecklistRemoteDataSource {
     required List<ChecklistModel> checklistData,
   }) async {
     try {
-      await apiClient.request(
-        path: '/api/v1/forms-data/save-data',
-        method: HttpMethod.post,
+      await apiClient.post(
+        '/api/v1/forms-data/save-data',
         data: {
           'mineId': supervisorId,
           'operationalDate': DateTime.now().toIso8601String(),

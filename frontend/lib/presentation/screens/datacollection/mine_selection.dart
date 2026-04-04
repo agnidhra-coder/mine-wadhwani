@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:mine_wadhwani/core/routing/app_router.gr.dart';
+
 @RoutePage()
 class MineSelectionPage extends StatefulWidget {
   const MineSelectionPage({super.key});
@@ -62,9 +63,7 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
       appBar: _buildAppBar(),
       body: Column(
         children: [
-          // Progress indicator
           _buildProgressBar(step: 1, total: 2),
-
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -76,9 +75,7 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
                     title: 'Mine Details',
                     subtitle: 'Select the mine and inspection area',
                   ),
-
                   const SizedBox(height: 24),
-
                   _buildDropdownCard(
                     label: 'Mine Name',
                     hint: 'Select mine',
@@ -87,9 +84,7 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
                     items: _mines,
                     onChanged: (val) => setState(() => _selectedMine = val),
                   ),
-
                   const SizedBox(height: 16),
-
                   _buildDropdownCard(
                     label: 'Mine Type',
                     hint: 'Select mine type',
@@ -99,9 +94,7 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
                     onChanged: (val) =>
                         setState(() => _selectedMineType = val),
                   ),
-
                   const SizedBox(height: 16),
-
                   _buildDropdownCard(
                     label: 'Area for Inspection',
                     hint: 'Select area',
@@ -110,10 +103,7 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
                     items: _areas,
                     onChanged: (val) => setState(() => _selectedArea = val),
                   ),
-
                   const SizedBox(height: 32),
-
-                  // Next Button
                   SizedBox(
                     width: double.infinity,
                     height: 52,
@@ -138,9 +128,9 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
                         ),
                         elevation: 0,
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Text(
                             'Next',
                             style: TextStyle(
@@ -170,11 +160,11 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
       elevation: 0,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_rounded),
-        onPressed: () => Navigator.of(context).maybePop(),
+        onPressed: () => context.router.maybePop(),
       ),
-      title: Column(
+      title: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           Text(
             'Start Inspection',
             style: TextStyle(
@@ -225,7 +215,7 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: navyBlue.withOpacity(0.08),
+            color: navyBlue.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: navyBlue, size: 22),
@@ -265,11 +255,13 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: value != null ? navyBlue.withOpacity(0.3) : Colors.grey.shade200,
+          color: value != null
+              ? navyBlue.withValues(alpha: 0.3)
+              : Colors.grey.shade200,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.06),
+            color: Colors.grey.withValues(alpha: 0.06),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
