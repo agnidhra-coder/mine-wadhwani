@@ -182,7 +182,7 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
                     child: ElevatedButton(
                       onPressed: _canProceed
                           ? () {
-                              context.router.push(const ChecklistRoute());
+                              context.router.push(const ChecklistOverviewRoute());
                             }
                           : null,
                       style: ElevatedButton.styleFrom(

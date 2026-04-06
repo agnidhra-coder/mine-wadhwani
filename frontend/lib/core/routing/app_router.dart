@@ -29,6 +29,11 @@ class AppRouter extends RootStackRouter {
           guards: [authGuard],
         ),
         AutoRoute(
+          page: ChecklistOverviewRoute.page,
+          path: '/checklist-overview',
+          guards: [authGuard],
+        ),
+        AutoRoute(
           page: ChecklistRoute.page,
           path: '/checklist',
           guards: [authGuard],
