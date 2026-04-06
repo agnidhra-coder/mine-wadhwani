@@ -17,15 +17,16 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  static const Color navyBlue = Color(0xFF1B2A4A);
+  static const Color primary = Color(0xFF1F579C);
+  static const Color blue = Color(0xFF2563EB);
   static const Color accentOrange = Color(0xFFE8450A);
 
   final List<_DashboardCard> _cards = const [
     _DashboardCard(
       icon: Icons.checklist_rounded,
-      iconBgColor: Color(0xFF1B2A4A),
+      iconBgColor: primary,
       iconColor: Colors.white,
-      accentColor: Color(0xFF1B2A4A),
+      accentColor: primary,
       title: 'Start Inspection',
       description:
           'Execute scheduled site audits and safety checklists for the current sector.',
@@ -42,8 +43,8 @@ class _HomePageState extends State<HomePage> {
     _DashboardCard(
       icon: Icons.engineering_rounded,
       iconBgColor: Color(0xFFE8F0FB),
-      iconColor: Color(0xFF1B2A4A),
-      accentColor: Color(0xFF1B2A4A),
+      iconColor: blue,
+      accentColor: blue,
       title: 'Corrective Actions',
       description:
           'Manage and resolve tasks assigned to your division or specific sector area.',
@@ -85,7 +86,7 @@ class _HomePageState extends State<HomePage> {
             state is Authenticated ? state.user.name : 'User';
 
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: const Color(0xFFF5F7FA),
           body: Column(
             children: [
               _buildTopBar(context, userName),
@@ -101,57 +102,85 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Command Center',
-                                style: TextStyle(
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.bold,
-                                  color: navyBlue,
+                        Row(
+                          children: [
+                            Container(
+                              width: 4,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: primary,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Command Center',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w800,
+                                    color: primary,
+                                    height: 1.1,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Text(
-                                    'Operations Dashboard • ',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey[600],
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF5F7FA),
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(color: Colors.grey.shade200),
+                                      ),
+                                      child: Text(
+                                        'Operations Dashboard',
+                                        style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    _formattedDate(),
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      color: accentOrange,
-                                      fontWeight: FontWeight.w600,
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFFF3EE),
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(color: accentOrange.withOpacity(0.3)),
+                                      ),
+                                      child: Text(
+                                        _formattedDate(),
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: accentOrange,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          ElevatedButton(
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                          ElevatedButton.icon(
                             onPressed: () {},
+                            icon: const Icon(Icons.phone_in_talk_rounded, size: 15),
+                            label: const Text(
+                              'Emergency Contact',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: accentOrange,
+                              backgroundColor: const Color(0xFFD32F2F),
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 18, vertical: 14),
+                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               elevation: 0,
-                            ),
-                            child: const Text(
-                              'Emergency Contact',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                              ),
                             ),
                           ),
                         ],
@@ -193,7 +222,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildTopBar(BuildContext context, String userName) {
     return Container(
-      color: const Color(0xFF1B2A4A),
+      color: primary,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: SafeArea(
         bottom: false,
@@ -207,8 +236,8 @@ class _HomePageState extends State<HomePage> {
                   'AIMSURE',
                   style: TextStyle(
                     color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 19,
                     letterSpacing: 1.2,
                   ),
                 ),
@@ -228,7 +257,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 const Text(
                   'Welcome,',
-                  style: TextStyle(color: Colors.white54, fontSize: 11),
+                  style: TextStyle(color: Colors.white54, fontSize: 12),
                 ),
                 Text(
                   userName,
@@ -248,10 +277,14 @@ class _HomePageState extends State<HomePage> {
             // Online badge
             Container(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.white12,
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.15), // 👈 premium subtle border
+                  width: 0.8,
+                ),
               ),
               child: Row(
                 children: const [
@@ -261,7 +294,7 @@ class _HomePageState extends State<HomePage> {
                     'ONLINE',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 11,
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -280,7 +313,7 @@ class _HomePageState extends State<HomePage> {
             // Check Pending
             Container(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.white38),
                 borderRadius: BorderRadius.circular(6),
@@ -291,17 +324,17 @@ class _HomePageState extends State<HomePage> {
                     'CHECK PENDING',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 11,
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 6, vertical: 2),
+                        horizontal: 6, vertical: 3),
                     decoration: BoxDecoration(
                       color: Colors.redAccent,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(9),
                     ),
                     child: const Text(
                       '12',
@@ -319,17 +352,77 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(width: 12),
 
             // Logout avatar button
-            GestureDetector(
-              onTap: () {
-                context.read<AuthBloc>().add(const AuthLogoutRequested());
+            PopupMenuButton(
+              offset: const Offset(0, 48),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              color: Colors.white,
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  enabled: false,
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 26,
+                        backgroundColor: const Color(0xFFE8F0FB),
+                        child: Text(
+                          userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                            color: primary,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        userName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Divider(height: 1),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'profile',
+                  child: Row(
+                    children: const [
+                      Icon(Icons.person_outline_rounded, size: 17, color: Colors.black54),
+                      SizedBox(width: 10),
+                      Text('My Profile', style: TextStyle(fontSize: 13)),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'logout',
+                  child: Row(
+                    children: const [
+                      Icon(Icons.logout_rounded, size: 17, color: Colors.redAccent),
+                      SizedBox(width: 10),
+                      Text('Logout', style: TextStyle(fontSize: 13, color: Colors.redAccent)),
+                    ],
+                  ),
+                ),
+              ],
+              onSelected: (value) {
+                if (value == 'logout') {
+                  context.read<AuthBloc>().add(const AuthLogoutRequested());
+                }
               },
-              child: Tooltip(
-                message: 'Logout',
-                child: CircleAvatar(
-                  radius: 18,
-                  backgroundColor: Colors.white24,
-                  child: const Icon(Icons.person,
-                      color: Colors.white, size: 20),
+              child: CircleAvatar(
+                radius: 18,
+                backgroundColor: Colors.white24,
+                child: Text(
+                  userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -399,8 +492,8 @@ class _HomePageState extends State<HomePage> {
                     Text(
                       card.title,
                       style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
                         color: Color(0xFF1A1A2E),
                       ),
                     ),
@@ -409,8 +502,9 @@ class _HomePageState extends State<HomePage> {
                       card.description,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey[600],
-                        height: 1.4,
+                        color: Colors.grey[500],
+                        height: 1.5,
+                        letterSpacing: 0.2,
                       ),
                     ),
                   ],
@@ -429,7 +523,6 @@ class _HomePageState extends State<HomePage> {
       _NavItem(icon: Icons.checklist_rounded, label: 'INSPECTIONS'),
       _NavItem(icon: Icons.bolt_rounded, label: 'ACTIONS'),
       _NavItem(icon: Icons.bar_chart_rounded, label: 'REPORTS'),
-      _NavItem(icon: Icons.person_rounded, label: 'PROFILE'),
     ];
 
     return Container(
@@ -459,7 +552,7 @@ class _HomePageState extends State<HomePage> {
                   Icon(
                     items[index].icon,
                     color: isSelected
-                        ? const Color(0xFF1B2A4A)
+                        ? primary
                         : Colors.grey[500],
                     size: 22,
                   ),
@@ -472,7 +565,7 @@ class _HomePageState extends State<HomePage> {
                           ? FontWeight.bold
                           : FontWeight.normal,
                       color: isSelected
-                          ? const Color(0xFF1B2A4A)
+                          ? primary
                           : Colors.grey[500],
                     ),
                   ),
