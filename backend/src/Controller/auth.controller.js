@@ -20,7 +20,9 @@ const RegisterUser = async (req, res) => {
     if (email_user) {
       return res
         .status(409)
-        .json(ApiResponse.error("User email already exists, please login", 409));
+        .json(
+          ApiResponse.error("User email already exists, please login", 409),
+        );
     }
 
     const user = await UserModel.findOne({
@@ -30,7 +32,12 @@ const RegisterUser = async (req, res) => {
     if (user) {
       return res
         .status(409)
-        .json(ApiResponse.error("User mobile number already exists, please login", 409));
+        .json(
+          ApiResponse.error(
+            "User mobile number already exists, please login",
+            409,
+          ),
+        );
     }
 
     const hashpassword = await bcrypt.hash(password, 10);

@@ -36,30 +36,42 @@ const save_data = async (req, res) => {
       Inspector_id,
       checklistData,
     } = req.body;
-    if(!mine_name){
-      return res.status(400).json(ApiResponse.error("mine_name is required", 400));
+    if (!mine_name) {
+      return res
+        .status(400)
+        .json(ApiResponse.error("mine_name is required", 400));
     }
-    if(!mine_type) {
-      return res.status(400).json(ApiResponse.error("mine_type is required", 400));
+    if (!mine_type) {
+      return res
+        .status(400)
+        .json(ApiResponse.error("mine_type is required", 400));
     }
-    if(!area) {
+    if (!area) {
       return res.status(400).json(ApiResponse.error("area is required", 400));
     }
-    if(!shift) {
+    if (!shift) {
       return res.status(400).json(ApiResponse.error("shift is required", 400));
     }
-    if(!Inspection_type) {
-      return res.status(400).json(ApiResponse.error("Inspection_type is required", 400));
+    if (!Inspection_type) {
+      return res
+        .status(400)
+        .json(ApiResponse.error("Inspection_type is required", 400));
     }
-    if(!Inspector_id) {
-      return res.status(400).json(ApiResponse.error("Inspector_id is required", 400));
+    if (!Inspector_id) {
+      return res
+        .status(400)
+        .json(ApiResponse.error("Inspector_id is required", 400));
     }
-    if(checklistData) {
-      if(checklistData.length === 0) {
-        return res.status(400).json(ApiResponse.error("checklist data can not be empty", 400));
+    if (checklistData) {
+      if (checklistData.length === 0) {
+        return res
+          .status(400)
+          .json(ApiResponse.error("checklist data can not be empty", 400));
       }
-      if(!Array.isArray(checklistData)) {
-        return res.status(400).json(ApiResponse.error("checklistData must be an array", 400));
+      if (!Array.isArray(checklistData)) {
+        return res
+          .status(400)
+          .json(ApiResponse.error("checklistData must be an array", 400));
       }
     }
     const Question = await QuestionModel.create({
