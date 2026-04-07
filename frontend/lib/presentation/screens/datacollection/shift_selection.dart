@@ -20,9 +20,9 @@ class ShiftSelectionPage extends StatefulWidget {
 }
 
 class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
-  static const Color navyBlue = Color(0xFF1B2A4A);
-  static const Color accentOrange = Color(0xFFE8450A);
+  static const Color navyBlue = Color(0xFF1F579C);
   static const Color lightBg = Color(0xFFF5F7FA);
+  static const Color greenAccent = Color(0xFF3DAA6E);
 
   String? _selectedShift;
   String? _selectedInspectionType;
@@ -114,7 +114,7 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
                               boxShadow: isSelected
                                   ? [
                                       BoxShadow(
-                                        color: navyBlue.withOpacity(0.2),
+                                        color: navyBlue.withValues(alpha: 0.2),
                                         blurRadius: 8,
                                         offset: const Offset(0, 3),
                                       )
@@ -186,7 +186,7 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
                             }
                           : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: accentOrange,
+                        backgroundColor: navyBlue,
                         disabledBackgroundColor: Colors.grey.shade300,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
@@ -260,7 +260,7 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
               margin: EdgeInsets.only(right: index < total - 1 ? 8 : 0),
               height: 4,
               decoration: BoxDecoration(
-                color: isActive ? accentOrange : Colors.white24,
+                color: isActive ? greenAccent : Colors.white24,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -275,9 +275,11 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: navyBlue.withOpacity(0.05),
+        color: navyBlue.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: navyBlue.withOpacity(0.12)),
+        border: Border.all(
+        color: navyBlue.withValues(alpha: 0.12),
+      ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,7 +339,7 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: navyBlue.withOpacity(0.08),
+            color: navyBlue.withValues(alpha: 0.8),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: navyBlue, size: 22),
@@ -378,12 +380,12 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: value != null
-              ? navyBlue.withOpacity(0.3)
+              ? navyBlue.withValues(alpha: 0.3)
               : Colors.grey.shade200,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.06),
+            color: Colors.grey.withValues(alpha: 0.06),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

@@ -11,13 +11,27 @@ class MineSelectionPage extends StatefulWidget {
 }
 
 class _MineSelectionPageState extends State<MineSelectionPage> {
-  static const Color navyBlue = Color(0xFF1B2A4A);
-  static const Color accentOrange = Color(0xFFE8450A);
+  static const Color navyBlue = Color(0xFF1F579C);
   static const Color lightBg = Color(0xFFF5F7FA);
+  static const Color greenAccent = Color(0xFF3DAA6E);
 
   String? _selectedMine;
   String? _selectedMineType;
   String? _selectedArea;
+  String? _selectedCompany;
+
+  final List<String> _companies = [
+  'Coal India Limited',
+  'Singareni Collieries Company',
+  'Gujarat Mineral Development Corp',
+  'Hindustan Copper Limited',
+  'National Mineral Development Corp',
+  'Steel Authority of India',
+  'Tata Steel Mining',
+  'Vedanta Resources',
+  'Adani Enterprises',
+  'JSW Steel',
+  ];
 
   final List<String> _mines = [
     'Bharat Coking Coal Ltd',
@@ -37,24 +51,35 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
     'Underground',
     'Coal',
     'Metal',
+    'Non-Metal',
   ];
 
   final List<String> _areas = [
-    'Panel',
-    'Face',
-    'Haul road',
-    'CHP',
-    'Workshop',
-    'Substation',
-    'Pump house',
-    'Magazine',
-    'Shaft/In-bye/Out-bye',
+    // 'Panel',
+    // 'Face',
+    // 'Haul road',
+    // 'CHP',
+    // 'Workshop',
+    // 'Substation',
+    // 'Pump house',
+    // 'Magazine',
+    // 'Shaft/In-bye/Out-bye',
+    'Working Face',
+    'Travelling Galleries',
+    'Hauling Roadways',
+    'Man-riding Roadways',
+    'Pumping Area',
+    'Pillar',
+    'Rest Shelter',
+    'Underground Substation',
+    'Explosive Magazine',
   ];
 
   bool get _canProceed =>
-      _selectedMine != null &&
-      _selectedMineType != null &&
-      _selectedArea != null;
+    _selectedMine != null &&
+    _selectedMineType != null &&
+    _selectedArea != null &&
+    _selectedCompany != null;
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +101,15 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
                     subtitle: 'Select the mine and inspection area',
                   ),
                   const SizedBox(height: 24),
+                  _buildDropdownCard(
+                    label: 'Company Name',
+                    hint: 'Select company',
+                    icon: Icons.domain_rounded,
+                    value: _selectedCompany,
+                    items: _companies,
+                    onChanged: (val) => setState(() => _selectedCompany = val),
+                  ),
+                  const SizedBox(height: 16),
                   _buildDropdownCard(
                     label: 'Mine Name',
                     hint: 'Select mine',
@@ -120,7 +154,7 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
                             }
                           : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: accentOrange,
+                        backgroundColor: navyBlue,
                         disabledBackgroundColor: Colors.grey.shade300,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
@@ -194,7 +228,7 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
               margin: EdgeInsets.only(right: index < total - 1 ? 8 : 0),
               height: 4,
               decoration: BoxDecoration(
-                color: isActive ? accentOrange : Colors.white24,
+                color: isActive ? greenAccent : Colors.white24,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
