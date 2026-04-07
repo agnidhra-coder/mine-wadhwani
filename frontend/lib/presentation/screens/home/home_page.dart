@@ -15,7 +15,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
+  // int _selectedIndex = 0;
 
   static const Color primary = Color(0xFF1F579C);
   static const Color blue = Color(0xFF2563EB);
@@ -517,66 +517,66 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildBottomNav() {
-    final items = [
-      _NavItem(icon: Icons.home_rounded, label: 'HOME'),
-      _NavItem(icon: Icons.checklist_rounded, label: 'INSPECTIONS'),
-      _NavItem(icon: Icons.bolt_rounded, label: 'ACTIONS'),
-      _NavItem(icon: Icons.bar_chart_rounded, label: 'REPORTS'),
-    ];
+  // Widget _buildBottomNav() {
+  //   final items = [
+  //     _NavItem(icon: Icons.home_rounded, label: 'HOME'),
+  //     _NavItem(icon: Icons.checklist_rounded, label: 'INSPECTIONS'),
+  //     _NavItem(icon: Icons.bolt_rounded, label: 'ACTIONS'),
+  //     _NavItem(icon: Icons.bar_chart_rounded, label: 'REPORTS'),
+  //   ];
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(items.length, (index) {
-          final isSelected = _selectedIndex == index;
-          return GestureDetector(
-            onTap: () => setState(() => _selectedIndex = index),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 16, vertical: 8),
-              decoration: isSelected
-                  ? BoxDecoration(
-                      color: const Color(0xFFE8F0FB),
-                      borderRadius: BorderRadius.circular(10),
-                    )
-                  : null,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    items[index].icon,
-                    color: isSelected
-                        ? primary
-                        : Colors.grey[500],
-                    size: 22,
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    items[index].label,
-                    style: TextStyle(
-                      fontSize: 9,
-                      fontWeight: isSelected
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                      color: isSelected
-                          ? primary
-                          : Colors.grey[500],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }),
-      ),
-    );
-  }
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       border: Border(top: BorderSide(color: Colors.grey.shade200)),
+  //     ),
+  //     padding: const EdgeInsets.symmetric(vertical: 8),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //       children: List.generate(items.length, (index) {
+  //         final isSelected = _selectedIndex == index;
+  //         return GestureDetector(
+  //           onTap: () => setState(() => _selectedIndex = index),
+  //           child: Container(
+  //             padding: const EdgeInsets.symmetric(
+  //                 horizontal: 16, vertical: 8),
+  //             decoration: isSelected
+  //                 ? BoxDecoration(
+  //                     color: const Color(0xFFE8F0FB),
+  //                     borderRadius: BorderRadius.circular(10),
+  //                   )
+  //                 : null,
+  //             child: Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: [
+  //                 Icon(
+  //                   items[index].icon,
+  //                   color: isSelected
+  //                       ? primary
+  //                       : Colors.grey[500],
+  //                   size: 22,
+  //                 ),
+  //                 const SizedBox(height: 3),
+  //                 Text(
+  //                   items[index].label,
+  //                   style: TextStyle(
+  //                     fontSize: 9,
+  //                     fontWeight: isSelected
+  //                         ? FontWeight.bold
+  //                         : FontWeight.normal,
+  //                     color: isSelected
+  //                         ? primary
+  //                         : Colors.grey[500],
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         );
+  //       }),
+  //     ),
+  //   );
+  // }
 
   String _formattedDate() {
     final now = DateTime.now();
@@ -606,8 +606,8 @@ class _DashboardCard {
   });
 }
 
-class _NavItem {
-  final IconData icon;
-  final String label;
-  const _NavItem({required this.icon, required this.label});
-}
+// class _NavItem {
+//   final IconData icon;
+//   final String label;
+//   const _NavItem({required this.icon, required this.label});
+// }
