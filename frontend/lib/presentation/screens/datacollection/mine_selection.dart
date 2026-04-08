@@ -49,9 +49,9 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
   final List<String> _mineTypes = [
     'Opencast',
     'Underground',
-    'Coal',
-    'Metal',
-    'Non-Metal',
+    // 'Coal',
+    // 'Metal',
+    // 'Non-Metal',
   ];
 
   final List<String> _areas = [
@@ -149,6 +149,7 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
                                   mineName: _selectedMine!,
                                   mineType: _selectedMineType!,
                                   area: _selectedArea!,
+                                  company: _selectedCompany!,
                                 ),
                               );
                             }
@@ -341,6 +342,7 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
               isExpanded: true,
               icon: const Icon(Icons.keyboard_arrow_down_rounded,
                   color: navyBlue),
+              dropdownColor: const Color(0xFFFAFAFA),
               style: const TextStyle(
                 fontSize: 14,
                 color: Color(0xFF1A1A2E),

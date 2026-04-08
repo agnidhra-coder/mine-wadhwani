@@ -7,12 +7,14 @@ class ShiftSelectionPage extends StatefulWidget {
   final String mineName;
   final String mineType;
   final String area;
+  final String company;
 
   const ShiftSelectionPage({
     super.key,
     required this.mineName,
     required this.mineType,
     required this.area,
+    required this.company,
   });
 
   @override
@@ -294,7 +296,9 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
             ),
           ),
           const SizedBox(height: 10),
-          _summaryRow(Icons.business_rounded, 'Mine', widget.mineName),
+          _summaryRow(Icons.apartment_rounded, 'Company', widget.company),
+          const SizedBox(height: 6),
+          _summaryRow(Icons.business_rounded, 'Mine', widget.mineName),  
           const SizedBox(height: 6),
           _summaryRow(Icons.category_rounded, 'Type', widget.mineType),
           const SizedBox(height: 6),
@@ -339,7 +343,7 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: navyBlue.withValues(alpha: 0.8),
+            color: const Color(0xFFE4EBF2),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: navyBlue, size: 22),
@@ -431,6 +435,7 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
               isExpanded: true,
               icon: const Icon(Icons.keyboard_arrow_down_rounded,
                   color: navyBlue),
+              dropdownColor: const Color(0xFFFAFAFA),
               style: const TextStyle(
                 fontSize: 14,
                 color: Color(0xFF1A1A2E),
