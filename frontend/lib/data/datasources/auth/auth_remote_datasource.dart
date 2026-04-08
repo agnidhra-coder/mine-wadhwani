@@ -14,6 +14,7 @@ abstract class AuthRemoteDataSource {
     required String email,
     required String password,
     required String mobilenumber,
+    required String role,
   });
 }
 
@@ -49,6 +50,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String email,
     required String password,
     required String mobilenumber,
+    required String role,
   }) async {
     try {
       final response = await apiClient.post(
@@ -58,6 +60,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'email': email,
           'password': password,
           'mobilenumber': mobilenumber,
+          'role': role,
         },
       );
 

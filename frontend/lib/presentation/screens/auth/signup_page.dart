@@ -29,6 +29,17 @@ class _SignupPageState extends State<SignupPage> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  String? _selectedRole;
+
+  final List<String> _roles = [
+    'Mine Manager',
+    'Assistant Mine Manager',
+    'Project Officer',
+    'Mine Foreman',
+    'Overman',
+    'Mining Sirdar',
+    'Other',
+  ];
 
   @override
   void dispose() {
@@ -42,12 +53,22 @@ class _SignupPageState extends State<SignupPage> {
 
   void _onRegister() {
     if (_formKey.currentState?.validate() ?? false) {
+      if (_selectedRole == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Please select a role'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+        return;
+      }
       context.read<AuthBloc>().add(
             AuthRegisterRequested(
               name: _nameController.text.trim(),
               email: _emailController.text.trim(),
               password: _passwordController.text,
               mobilenumber: _mobileController.text.trim(),
+              role: _selectedRole!,
             ),
           );
     }
@@ -149,6 +170,41 @@ class _SignupPageState extends State<SignupPage> {
                               }
                               if (value.trim().length < 10) {
                                 return 'Enter a valid mobile number';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          DropdownButtonFormField<String>(
+                            decoration: InputDecoration(
+                              labelText: 'Role',
+                              hintText: 'Select your role',
+                              prefixIcon: const Icon(Icons.assignment_ind_outlined),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                ),
+                              ),
+                            ),
+                            value: _selectedRole,
+                            items: _roles.map((role) {
+                              return DropdownMenuItem<String>(
+                                value: role,
+                                child: Text(role),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedRole = value;
+                              });
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please select a role';
                               }
                               return null;
                             },

@@ -28,6 +28,10 @@ const UserSchema = new mongoose.Schema(
       enum: ["SUPER_ADMIN", "MINE_ADMIN", "SUPERVISOR"],
       default: "SUPERVISOR",
     },
+    mine_role:{
+      type: String,
+      required:true,
+    },
     mineid: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Mine",
