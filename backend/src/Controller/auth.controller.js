@@ -5,9 +5,9 @@ import jwt from "jsonwebtoken";
 
 const RegisterUser = async (req, res) => {
   try {
-    const { name, email, password, mobilenumber, avatar } = req.body;
+    const { name, email, mine_role, password, mobilenumber, avatar } = req.body;
 
-    if (!name || !email || !password || !mobilenumber) {
+    if (!name || !email || !mine_role || !password || !mobilenumber) {
       return res
         .status(400)
         .json(ApiResponse.error("All fields are required", 400));
@@ -48,6 +48,7 @@ const RegisterUser = async (req, res) => {
       password: hashpassword,
       mobilenumber,
       avatar: avatar || "default-avatar-url.jpg",
+      mine_role,
     });
 
     const createduser = await UserModel.findById(newuser._id).select(

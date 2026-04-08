@@ -185,7 +185,7 @@ class _ChecklistOverviewPageState extends State<ChecklistOverviewPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Mining Compliance',
+                  'Inspection Overview',
                   style: AppTextStyles.headlineMedium.copyWith(
                     fontWeight: FontWeight.w800,
                     fontSize: 26,
@@ -193,7 +193,7 @@ class _ChecklistOverviewPageState extends State<ChecklistOverviewPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Audit Period: 2023-2024',
+                  'Select an area to begin inspection',
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.secondary,
                     fontSize: 14,
@@ -251,7 +251,7 @@ class _ChecklistOverviewPageState extends State<ChecklistOverviewPage> {
                 ),
               ),
               Text(
-                '$answered / $total Answered',
+                '$answered / $total Completed',
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
