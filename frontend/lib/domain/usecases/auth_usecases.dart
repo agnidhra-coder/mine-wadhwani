@@ -31,14 +31,14 @@ class RegisterParams {
   final String email;
   final String password;
   final String mobilenumber;
-  final String role;
+  final String mine_role;
 
   const RegisterParams({
     required this.name,
     required this.email,
     required this.password,
     required this.mobilenumber,
-    required this.role,
+    required this.mine_role,
   });
 }
 
@@ -54,7 +54,7 @@ class RegisterUseCase extends UseCase<UserEntity, RegisterParams> {
       email: params.email,
       password: params.password,
       mobilenumber: params.mobilenumber,
-      role: params.role,
+      mine_role: params.mine_role,
     );
   }
 }

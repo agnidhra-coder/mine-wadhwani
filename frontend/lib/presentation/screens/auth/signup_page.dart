@@ -68,7 +68,7 @@ class _SignupPageState extends State<SignupPage> {
               email: _emailController.text.trim(),
               password: _passwordController.text,
               mobilenumber: _mobileController.text.trim(),
-              role: _selectedRole!,
+              mine_role: _selectedRole!,
             ),
           );
     }

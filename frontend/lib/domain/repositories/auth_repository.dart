@@ -13,7 +13,7 @@ abstract class AuthRepository {
     required String email,
     required String password,
     required String mobilenumber,
-    required String role,
+    required String mine_role,
   });
 
   Future<Either<Failure, bool>> isLoggedIn();
