@@ -71,6 +71,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         email: event.email,
         password: event.password,
         mobilenumber: event.mobilenumber,
+        mine_role: event.mine_role,
       ),
     );
     result.fold(
