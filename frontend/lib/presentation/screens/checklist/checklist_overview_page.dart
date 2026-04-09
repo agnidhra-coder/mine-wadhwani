@@ -190,7 +190,7 @@ class _ChecklistOverviewPageState extends State<ChecklistOverviewPage> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: const Color(0xFF1F579C),
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,17 +200,18 @@ class _ChecklistOverviewPageState extends State<ChecklistOverviewPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Mining Compliance',
+                  'Inspection Overview',
                   style: AppTextStyles.headlineMedium.copyWith(
+                    color: const Color(0xFFFFFFFF),
                     fontWeight: FontWeight.w800,
                     fontSize: 26,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Audit Period: 2023-2024',
+                  'Select an area to begin inspection',
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.secondary,
+                    color: const Color(0xFFBDBDBD),
                     fontSize: 14,
                   ),
                 ),
@@ -266,7 +267,7 @@ class _ChecklistOverviewPageState extends State<ChecklistOverviewPage> {
                 ),
               ),
               Text(
-                '$answered / $total Answered',
+                '$answered / $total Completed',
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,

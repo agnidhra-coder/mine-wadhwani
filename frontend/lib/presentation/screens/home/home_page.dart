@@ -146,7 +146,9 @@ class _HomePageState extends State<HomePage> {
                                       decoration: BoxDecoration(
                                         color: const Color(0xFFFFF3EE),
                                         borderRadius: BorderRadius.circular(4),
-                                        border: Border.all(color: accentOrange.withOpacity(0.3)),
+                                        border: Border.all(
+                                        color: accentOrange.withValues(alpha: 0.3),
+                                      ),
                                       ),
                                       child: Text(
                                         _formattedDate(),
@@ -282,7 +284,7 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.white12,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.15), // 👈 premium subtle border
+                  color: Colors.white.withValues(alpha: 0.15), // 👈 premium subtle border
                   width: 0.8,
                 ),
               ),
@@ -443,7 +445,7 @@ class _HomePageState extends State<HomePage> {
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.07),
+            color: Colors.grey.withValues(alpha: 0.07),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
