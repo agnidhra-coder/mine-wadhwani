@@ -33,9 +33,21 @@ class UpdateComment extends ChecklistEvent {
 
 class SubmitChecklist extends ChecklistEvent {
   final String supervisorId;
+  final String mineName;
+  final String mineType;
+  final String area;
+  final int shift;
+  final String inspectionType;
 
-  const SubmitChecklist({required this.supervisorId});
+  const SubmitChecklist({
+    required this.supervisorId,
+    required this.mineName,
+    required this.mineType,
+    required this.area,
+    required this.shift,
+    required this.inspectionType,
+  });
 
   @override
-  List<Object?> get props => [supervisorId];
+  List<Object?> get props => [supervisorId, mineName, mineType, area, shift, inspectionType];
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:mine_wadhwani/core/error/exceptions.dart';
 import 'package:mine_wadhwani/core/network/api_client.dart';
 import 'package:mine_wadhwani/data/models/checklist/checklist_model.dart';
@@ -6,6 +7,11 @@ abstract class ChecklistRemoteDataSource {
   Future<List<ChecklistModel>> fetchChecklist();
   Future<void> submitChecklist({
     required String supervisorId,
+    required String mineName,
+    required String mineType,
+    required String area,
+    required int shift,
+    required String inspectionType,
     required List<ChecklistModel> checklistData,
   });
 }
@@ -39,19 +45,27 @@ class ChecklistRemoteDataSourceImpl implements ChecklistRemoteDataSource {
   @override
   Future<void> submitChecklist({
     required String supervisorId,
+    required String mineName,
+    required String mineType,
+    required String area,
+    required int shift,
+    required String inspectionType,
     required List<ChecklistModel> checklistData,
   }) async {
     try {
+      final payload = {
+        'mine_name': mineName,
+        'mine_type': mineType,
+        'area': area,
+        'shift': shift,
+        'Inspection_type': inspectionType,
+        'Inspector_id': supervisorId,
+        'checklistData': checklistData.map((e) => e.toJson()).toList(),
+      };
+      debugPrint('SUBMIT PAYLOAD: $payload');
       await apiClient.post(
         '/api/v1/forms-data/save-data',
-        data: {
-          'mineId': supervisorId,
-          'operationalDate': DateTime.now().toIso8601String(),
-          'shiftNumber': 1,
-          'supervisorId': supervisorId,
-          'checklistData': checklistData.map((e) => e.toJson()).toList(),
-          'startTime': DateTime.now().toIso8601String(),
-        },
+        data: payload,
       );
     } on ServerException {
       rethrow;

@@ -15,8 +15,21 @@ import 'package:mine_wadhwani/presentation/bloc/auth_bloc/auth_state.dart';
 @RoutePage()
 class ChecklistPage extends StatefulWidget {
   final int initialSectionIndex;
+  final String mineName;
+  final String mineType;
+  final String area;
+  final int shift;
+  final String inspectionType;
 
-  const ChecklistPage({super.key, @PathParam('sectionIndex') this.initialSectionIndex = 0});
+  const ChecklistPage({
+    super.key,
+    @PathParam('sectionIndex') this.initialSectionIndex = 0,
+    required this.mineName,
+    required this.mineType,
+    required this.area,
+    required this.shift,
+    required this.inspectionType,
+  });
 
   @override
   State<ChecklistPage> createState() => _ChecklistPageState();
@@ -60,8 +73,8 @@ class _ChecklistPageState extends State<ChecklistPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<ChecklistBloc>()..add(const FetchChecklist()),
+    return BlocProvider.value(
+      value: sl<ChecklistBloc>(),
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F7FA),
         body: BlocConsumer<ChecklistBloc, ChecklistState>(
@@ -75,9 +88,10 @@ class _ChecklistPageState extends State<ChecklistPage> {
               );
               context.router.maybePop();
             } else if (state is ChecklistError) {
+              debugPrint("error: ${state.message}");
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Something went wrong. Please try again.'),
+                SnackBar(
+                  content: Text(state.message),
                   backgroundColor: AppColors.error,
                 ),
               );
@@ -527,7 +541,13 @@ class _ChecklistPageState extends State<ChecklistPage> {
                                       : '';
                               context.read<ChecklistBloc>().add(
                                     SubmitChecklist(
-                                        supervisorId: supervisorId),
+                                      supervisorId: supervisorId,
+                                      mineName: widget.mineName,
+                                      mineType: widget.mineType,
+                                      area: widget.area,
+                                      shift: widget.shift,
+                                      inspectionType: widget.inspectionType,
+                                    ),
                                   );
                             } else {
                               setState(() {

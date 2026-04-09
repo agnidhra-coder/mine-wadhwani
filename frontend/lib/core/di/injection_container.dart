@@ -66,10 +66,11 @@ Future<void> init() async {
       getCachedUserUseCase: sl(),
     ),
   );
-  sl.registerFactory(
+  sl.registerLazySingleton(
     () => ChecklistBloc(
       getChecklistUseCase: sl(),
       submitChecklistUseCase: sl(),
+      sharedPreferences: sl(),
     ),
   );
 }
