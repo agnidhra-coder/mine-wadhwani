@@ -411,7 +411,7 @@ class _ChecklistOverviewPageState extends State<ChecklistOverviewPage> {
     );
   }
 
-  Widget _buildBottomBar(BuildContext context) {
+  Widget buildBottomBar(BuildContext context) {
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 10),
