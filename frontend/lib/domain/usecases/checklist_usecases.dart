@@ -17,10 +17,20 @@ class GetChecklistUseCase extends UseCase<List<ChecklistModel>, NoParams> {
 
 class SubmitChecklistParams {
   final String supervisorId;
+  final String mineName;
+  final String mineType;
+  final String area;
+  final int shift;
+  final String inspectionType;
   final List<ChecklistModel> checklistData;
 
   const SubmitChecklistParams({
     required this.supervisorId,
+    required this.mineName,
+    required this.mineType,
+    required this.area,
+    required this.shift,
+    required this.inspectionType,
     required this.checklistData,
   });
 }
@@ -34,6 +44,11 @@ class SubmitChecklistUseCase extends UseCase<void, SubmitChecklistParams> {
   Future<Either<Failure, void>> call(SubmitChecklistParams params) {
     return repository.submitChecklist(
       supervisorId: params.supervisorId,
+      mineName: params.mineName,
+      mineType: params.mineType,
+      area: params.area,
+      shift: params.shift,
+      inspectionType: params.inspectionType,
       checklistData: params.checklistData,
     );
   }

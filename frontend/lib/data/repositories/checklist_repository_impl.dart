@@ -23,11 +23,21 @@ class ChecklistRepositoryImpl implements ChecklistRepository {
   @override
   Future<Either<Failure, void>> submitChecklist({
     required String supervisorId,
+    required String mineName,
+    required String mineType,
+    required String area,
+    required int shift,
+    required String inspectionType,
     required List<ChecklistModel> checklistData,
   }) async {
     try {
       await remoteDataSource.submitChecklist(
         supervisorId: supervisorId,
+        mineName: mineName,
+        mineType: mineType,
+        area: area,
+        shift: shift,
+        inspectionType: inspectionType,
         checklistData: checklistData,
       );
       return const Right(null);

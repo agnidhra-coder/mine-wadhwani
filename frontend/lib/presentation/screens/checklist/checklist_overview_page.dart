@@ -13,7 +13,20 @@ import 'package:mine_wadhwani/presentation/bloc/checklist_bloc/checklist_state.d
 
 @RoutePage()
 class ChecklistOverviewPage extends StatefulWidget {
-  const ChecklistOverviewPage({super.key});
+  final String mineName;
+  final String mineType;
+  final String area;
+  final int shift;
+  final String inspectionType;
+
+  const ChecklistOverviewPage({
+    super.key,
+    required this.mineName,
+    required this.mineType,
+    required this.area,
+    required this.shift,
+    required this.inspectionType,
+  });
 
   @override
   State<ChecklistOverviewPage> createState() => _ChecklistOverviewPageState();
@@ -27,6 +40,8 @@ class _ChecklistOverviewPageState extends State<ChecklistOverviewPage> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+    // Refresh checklist data each time this screen is opened
+    sl<ChecklistBloc>().add(const FetchChecklist());
   }
 
   @override
@@ -64,8 +79,8 @@ class _ChecklistOverviewPageState extends State<ChecklistOverviewPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<ChecklistBloc>()..add(const FetchChecklist()),
+    return BlocProvider.value(
+      value: sl<ChecklistBloc>(),
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F7FA),
         body: BlocBuilder<ChecklistBloc, ChecklistState>(
@@ -292,7 +307,14 @@ class _ChecklistOverviewPageState extends State<ChecklistOverviewPage> {
       padding: const EdgeInsets.only(bottom: 12),
       child: GestureDetector(
         onTap: () {
-          context.router.push(ChecklistRoute(initialSectionIndex: index));
+          context.router.push(ChecklistRoute(
+            initialSectionIndex: index,
+            mineName: widget.mineName,
+            mineType: widget.mineType,
+            area: widget.area,
+            shift: widget.shift,
+            inspectionType: widget.inspectionType,
+          ));
         },
         child: Container(
           padding: const EdgeInsets.all(20),
