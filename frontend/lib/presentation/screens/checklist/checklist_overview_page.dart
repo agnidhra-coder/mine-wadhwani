@@ -175,7 +175,7 @@ class _ChecklistOverviewPageState extends State<ChecklistOverviewPage> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: const Color(0xFF1F579C),
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,6 +187,7 @@ class _ChecklistOverviewPageState extends State<ChecklistOverviewPage> {
                 Text(
                   'Inspection Overview',
                   style: AppTextStyles.headlineMedium.copyWith(
+                    color: const Color(0xFFFFFFFF),
                     fontWeight: FontWeight.w800,
                     fontSize: 26,
                   ),
@@ -195,7 +196,7 @@ class _ChecklistOverviewPageState extends State<ChecklistOverviewPage> {
                 Text(
                   'Select an area to begin inspection',
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.secondary,
+                    color: const Color(0xFFBDBDBD),
                     fontSize: 14,
                   ),
                 ),

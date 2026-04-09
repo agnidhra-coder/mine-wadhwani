@@ -22,28 +22,28 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
 
   final List<String> _companies = [
   'Coal India Limited',
-  'Singareni Collieries Company',
-  'Gujarat Mineral Development Corp',
-  'Hindustan Copper Limited',
-  'National Mineral Development Corp',
-  'Steel Authority of India',
-  'Tata Steel Mining',
-  'Vedanta Resources',
-  'Adani Enterprises',
-  'JSW Steel',
+  // 'Singareni Collieries Company',
+  // 'Gujarat Mineral Development Corp',
+  // 'Hindustan Copper Limited',
+  // 'National Mineral Development Corp',
+  // 'Steel Authority of India',
+  // 'Tata Steel Mining',
+  // 'Vedanta Resources',
+  // 'Adani Enterprises',
+  // 'JSW Steel',
   ];
 
   final List<String> _mines = [
     'Bharat Coking Coal Ltd',
-    'Central Coalfields Ltd',
-    'Eastern Coalfields Ltd',
-    'Mahanadi Coalfields Ltd',
-    'Northern Coalfields Ltd',
-    'South Eastern Coalfields Ltd',
-    'Western Coalfields Ltd',
-    'Singareni Collieries',
-    'Gujarat Mineral Development',
-    'Hindustan Copper Ltd',
+    // 'Central Coalfields Ltd',
+    // 'Eastern Coalfields Ltd',
+    // 'Mahanadi Coalfields Ltd',
+    // 'Northern Coalfields Ltd',
+    // 'South Eastern Coalfields Ltd',
+    // 'Western Coalfields Ltd',
+    // 'Singareni Collieries',
+    // 'Gujarat Mineral Development',
+    // 'Hindustan Copper Ltd',
   ];
 
   final List<String> _mineTypes = [
