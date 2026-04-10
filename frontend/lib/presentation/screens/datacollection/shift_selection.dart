@@ -47,6 +47,7 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
     'Dust/noise inspection',
     'Contractor work inspection',
     'PPE compliance inspection',
+    'Stockpile inspection',
   ];
 
   bool get _canProceed =>
@@ -184,13 +185,23 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
                     child: ElevatedButton(
                       onPressed: _canProceed
                           ? () {
-                              context.router.push(ChecklistOverviewRoute(
-                                mineName: widget.mineName,
-                                mineType: widget.mineType,
-                                area: widget.area,
-                                shift: int.parse(_selectedShift!),
-                                inspectionType: _selectedInspectionType!,
-                              ));
+                              if (_selectedInspectionType == 'Stockpile inspection') {
+                                context.router.push(StockpileOverviewRoute(
+                                  mineName: widget.mineName,
+                                  mineType: widget.mineType,
+                                  area: widget.area,
+                                  shift: int.parse(_selectedShift!),
+                                  inspectionType: _selectedInspectionType!,
+                                ));
+                              } else {
+                                context.router.push(ChecklistOverviewRoute(
+                                  mineName: widget.mineName,
+                                  mineType: widget.mineType,
+                                  area: widget.area,
+                                  shift: int.parse(_selectedShift!),
+                                  inspectionType: _selectedInspectionType!,
+                                ));
+                              }
                             }
                           : null,
                       style: ElevatedButton.styleFrom(

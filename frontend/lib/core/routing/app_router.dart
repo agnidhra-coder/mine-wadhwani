@@ -39,6 +39,11 @@ class AppRouter extends RootStackRouter {
           guards: [authGuard],
         ),
         AutoRoute(
+          page: StockpileOverviewRoute.page,
+          path: '/stockpile-overview',
+          guards: [authGuard],
+        ),
+        AutoRoute(
           page: HazardDatabaseRoute.page,
           path: '/hazard-database',
           guards: [authGuard],
