@@ -56,7 +56,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
         email: userJson['email'] as String,
         mobilenumber: userJson['mobilenumber'] as String,
         avatar: userJson['avatar'] as String? ?? 'default-avatar-url.jpg',
-        role: userJson['role'] as String? ?? 'SUPERVISOR',
+        role: (userJson['mine_role'] ?? userJson['role']) as String? ?? '',
         mineid: userJson['mineid'] as String?,
         token: userJson['token'] as String? ?? '',
       );

@@ -21,7 +21,7 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
   String? _selectedCompany;
 
   final List<String> _companies = [
-  'Coal India Limited',
+  'Coal India Limited (CIL)',
   // 'Singareni Collieries Company',
   // 'Gujarat Mineral Development Corp',
   // 'Hindustan Copper Limited',
@@ -34,7 +34,7 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
   ];
 
   final List<String> _mines = [
-    'Bharat Coking Coal Ltd',
+    'Bharat Coking Coal Limited (BCCL)',
     // 'Central Coalfields Ltd',
     // 'Eastern Coalfields Ltd',
     // 'Mahanadi Coalfields Ltd',
@@ -64,15 +64,32 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
     // 'Pump house',
     // 'Magazine',
     // 'Shaft/In-bye/Out-bye',
-    'Working Face',
-    'Travelling Galleries',
-    'Hauling Roadways',
-    'Man-riding Roadways',
-    'Pumping Area',
-    'Pillar',
-    'Rest Shelter',
-    'Underground Substation',
-    'Explosive Magazine',
+    // 'Working Face',
+    // 'Travelling Galleries',
+    // 'Hauling Roadways',
+    // 'Man-riding Roadways',
+    // 'Pumping Area',
+    // 'Pillar',
+    // 'Rest Shelter',
+    // 'Underground Substation',
+    // 'Explosive Magazine',
+        'Kusunda',
+        // 'East Basuriya',
+        // 'Sijua',
+        // 'Tetulmari',
+        // 'Mudidih',
+        // 'Katras Choitoudih',
+        // 'Jogta',
+        // 'Govindpur',
+        // 'Bastacolla',
+        // 'Lodna',
+        // 'Barora',
+        // 'Block II',
+        // 'Pootkee Balihari',
+        // 'Dahibari',
+        // 'Basantimata',
+        // 'Phularitand',
+        // 'Muraidih'
   ];
 
   bool get _canProceed =>
@@ -111,8 +128,8 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
                   ),
                   const SizedBox(height: 16),
                   _buildDropdownCard(
-                    label: 'Mine Name',
-                    hint: 'Select mine',
+                    label: 'Subsidiaries',
+                    hint: 'Select subsidiaries',
                     icon: Icons.business_rounded,
                     value: _selectedMine,
                     items: _mines,
@@ -130,8 +147,8 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
                   ),
                   const SizedBox(height: 16),
                   _buildDropdownCard(
-                    label: 'Area for Inspection',
-                    hint: 'Select area',
+                    label: 'Mine Name',
+                    hint: 'Select mine name',
                     icon: Icons.map_rounded,
                     value: _selectedArea,
                     items: _areas,

@@ -195,7 +195,7 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'OVERALL PROGRESS',
+                'OVERALL INSPECTION PROGRESS',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,

@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:mine_wadhwani/core/routing/app_router.gr.dart';
+import 'mine_info_page.dart';
 
 @RoutePage()
 class ShiftSelectionPage extends StatefulWidget {
@@ -28,6 +29,7 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
 
   String? _selectedShift;
   String? _selectedInspectionType;
+  bool _mineInfoReviewed = false;
 
   final List<Map<String, dynamic>> _shifts = [
     {'label': 'Shift 1', 'value': '1', 'time': '6:00 AM – 2:00 PM'},
@@ -53,6 +55,22 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
   bool get _canProceed =>
       _selectedShift != null && _selectedInspectionType != null;
 
+  void _openMineInfo() async {
+    final reviewed = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => MineInfoPage(
+          mineName: widget.area,
+          mineType: widget.mineType,
+          company: widget.company,
+          subsidiary: widget.mineName,
+        ),
+      ),
+    );
+    if (reviewed == true) {
+      setState(() => _mineInfoReviewed = true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,27 +79,20 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
       body: Column(
         children: [
           _buildProgressBar(step: 2, total: 2),
-
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Summary card from previous screen
                   _buildSummaryCard(),
-
                   const SizedBox(height: 24),
-
                   _buildSectionHeader(
                     icon: Icons.access_time_rounded,
                     title: 'Shift & Inspection',
                     subtitle: 'Select shift and type of inspection',
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Shift selector (tap cards)
                   const Text(
                     'SHIFT',
                     style: TextStyle(
@@ -162,10 +173,7 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
                       );
                     }).toList(),
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Inspection type dropdown
                   _buildDropdownCard(
                     label: 'Inspection Type',
                     hint: 'Select inspection type',
@@ -175,17 +183,15 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
                     onChanged: (val) =>
                         setState(() => _selectedInspectionType = val),
                   ),
-
                   const SizedBox(height: 32),
-
-                  // Next Button
                   SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
                       onPressed: _canProceed
                           ? () {
-                              if (_selectedInspectionType == 'Stockpile inspection') {
+                              if (_selectedInspectionType ==
+                                  'Stockpile inspection') {
                                 context.router.push(StockpileOverviewRoute(
                                   mineName: widget.mineName,
                                   mineType: widget.mineType,
@@ -213,9 +219,9 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
                         ),
                         elevation: 0,
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Text(
                             'Next',
                             style: TextStyle(
@@ -247,9 +253,9 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
         icon: const Icon(Icons.arrow_back_ios_rounded),
         onPressed: () => context.router.maybePop(),
       ),
-      title: Column(
+      title: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           Text(
             'Start Inspection',
             style: TextStyle(
@@ -297,8 +303,8 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
         color: navyBlue.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-        color: navyBlue.withValues(alpha: 0.12),
-      ),
+          color: navyBlue.withValues(alpha: 0.12),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,11 +321,51 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
           const SizedBox(height: 10),
           _summaryRow(Icons.apartment_rounded, 'Company', widget.company),
           const SizedBox(height: 6),
-          _summaryRow(Icons.business_rounded, 'Mine', widget.mineName),  
+          _summaryRow(
+              Icons.business_rounded, 'Subsidiaries', widget.mineName),
           const SizedBox(height: 6),
           _summaryRow(Icons.category_rounded, 'Type', widget.mineType),
           const SizedBox(height: 6),
-          _summaryRow(Icons.map_rounded, 'Area', widget.area),
+          _summaryRow(Icons.map_rounded, 'Mine', widget.area),
+
+          // ── View Mine Info row ──────────────────────────────────────
+          const SizedBox(height: 12),
+          const Divider(height: 1, thickness: 0.5),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: _openMineInfo,
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline_rounded,
+                  size: 15,
+                  color: _mineInfoReviewed ? greenAccent : navyBlue,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  _mineInfoReviewed
+                      ? 'Mine info reviewed'
+                      : 'View mine info',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: _mineInfoReviewed ? greenAccent : navyBlue,
+                    decoration: _mineInfoReviewed
+                        ? TextDecoration.none
+                        : TextDecoration.underline,
+                  ),
+                ),
+                const Spacer(),
+                if (_mineInfoReviewed)
+                  const Icon(Icons.check_circle_rounded,
+                      size: 16, color: greenAccent)
+                else
+                  const Icon(Icons.chevron_right_rounded,
+                      size: 18, color: navyBlue),
+              ],
+            ),
+          ),
+          // ────────────────────────────────────────────────────────────
         ],
       ),
     );

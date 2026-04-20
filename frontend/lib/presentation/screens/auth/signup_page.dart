@@ -666,7 +666,7 @@ class _SignupPageState extends State<SignupPage> {
           _buildLabel('Role'),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
-            value: _selectedRole,
+            initialValue: _selectedRole,
             decoration: InputDecoration(
               hintText: 'Select your role',
               hintStyle:
