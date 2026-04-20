@@ -84,12 +84,13 @@ class _HomePageState extends State<HomePage> {
       builder: (context, state) {
         final userName =
             state is Authenticated ? state.user.name : 'User';
+        final userRole = state is Authenticated ? state.user.role : '';
 
         return Scaffold(
           backgroundColor: const Color(0xFFF5F7FA),
           body: Column(
             children: [
-              _buildTopBar(context, userName),
+              _buildTopBar(context, userName, userRole),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(
@@ -222,7 +223,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildTopBar(BuildContext context, String userName) {
+  Widget _buildTopBar(BuildContext context, String userName, String userRole) {
     return Container(
       color: primary,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -271,6 +272,15 @@ class _HomePageState extends State<HomePage> {
                     decorationColor: Colors.white,
                   ),
                 ),
+                if (userRole.isNotEmpty)
+                  Text(
+                    userRole,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
               ],
             ),
 
@@ -359,36 +369,48 @@ class _HomePageState extends State<HomePage> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               color: Colors.white,
               itemBuilder: (context) => [
-                PopupMenuItem(
-                  enabled: false,
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 26,
-                        backgroundColor: const Color(0xFFE8F0FB),
-                        child: Text(
-                          userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w700,
-                            color: primary,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        userName,
+              PopupMenuItem(
+                enabled: false,
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 26,
+                      backgroundColor: const Color(0xFFE8F0FB),
+                      child: Text(
+                        userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
                         style: const TextStyle(
+                          fontSize: 24,
                           fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                          color: Colors.black87,
+                          color: primary,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      const Divider(height: 1),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      userName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    // 👇 Add this
+                    if (userRole.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        userRole,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ],
-                  ),
+                    const SizedBox(height: 4),
+                    const Divider(height: 1),
+                  ],
                 ),
+              ),
                 PopupMenuItem(
                   value: 'profile',
                   child: Row(

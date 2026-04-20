@@ -38,7 +38,21 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
   late int _currentSectionIndex;
   late Map<String, String> _answers;
   late Map<String, String> _comments;
+  final Set<String> _expandedNotes = <String>{};
   final Map<String, TextEditingController> _controllers = {};
+
+    Color _getOptionColor(String option) {
+    switch (option) {
+      case 'YES':
+        return Color(0xFF10B981);
+      case 'NO':
+        return Color(0xFFEF4444);
+      case 'NA':
+        return Color(0xFF9CA3AF);
+      default:
+        return const Color(0xFF1F579C);
+    }
+  }
 
   @override
   void initState() {
@@ -46,6 +60,11 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
     _currentSectionIndex = widget.sectionIndex;
     _answers = Map.from(widget.answers);
     _comments = Map.from(widget.comments);
+    _expandedNotes.addAll(
+      _comments.entries
+          .where((entry) => entry.value.trim().isNotEmpty)
+          .map((entry) => entry.key),
+    );
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
@@ -126,14 +145,14 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: const Color(0xFF1F579C),
       padding: const EdgeInsets.only(top: 12, bottom: 8, left: 8, right: 16),
       child: Row(
         children: [
           IconButton(
             icon: const Icon(Icons.chevron_left, size: 28),
             onPressed: _popWithResult,
-            color: AppColors.onSurface,
+            color: const Color.fromARGB(255, 255, 255, 255),
           ),
           Expanded(
             child: Column(
@@ -142,7 +161,7 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.outline.withValues(alpha: 0.3),
+                    color: const Color.fromARGB(255, 255, 254, 255).withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -150,7 +169,7 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
                 Text(
                   'SECTION ${_currentSectionIndex + 1} OF ${widget.sections.length}',
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.secondary,
+                    color: const Color.fromARGB(255, 255, 255, 255),
                     fontSize: 13,
                     letterSpacing: 0.5,
                   ),
@@ -221,7 +240,7 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color(0xFF2C3E6B),
+                color: const Color(0xFF1F579C),
                 borderRadius: BorderRadius.circular(10),
               ),
               alignment: Alignment.center,
@@ -289,6 +308,8 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
   Widget _buildYesNoCard(StockpileQuestion question) {
     final answer = _answers[question.code] ?? '';
     final hasAnswer = answer.isNotEmpty;
+    final hasComment = (_comments[question.code] ?? '').trim().isNotEmpty;
+    final showNoteField = _expandedNotes.contains(question.code) || hasComment;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -309,7 +330,7 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2C3E6B),
+                    color: const Color(0xFF1F579C),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   alignment: Alignment.center,
@@ -353,37 +374,59 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
               const SizedBox(height: 6),
             ] else
               const SizedBox(height: 10),
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFF5F7FA),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE0E3EA)),
-              ),
-              child: TextField(
-                controller: _controller(question.code),
-                decoration: InputDecoration(
-                  hintText: hasAnswer
-                      ? 'Add optional notes or evidence reference...'
-                      : 'Comment (optional)',
-                  hintStyle: TextStyle(
-                    color: AppColors.outline.withValues(alpha: 0.6),
-                    fontSize: 14,
+            if (showNoteField)
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F7FA),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE0E3EA)),
+                ),
+                child: TextField(
+                  controller: _controller(question.code),
+                  decoration: InputDecoration(
+                    hintText: 'Add optional notes or evidence reference...',
+                    hintStyle: TextStyle(
+                      color: AppColors.outline.withValues(alpha: 0.6),
+                      fontSize: 14,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                   ),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
+                  maxLines: 3,
+                  minLines: 2,
+                  onChanged: (value) {
+                    setState(() {
+                      _comments[question.code] = value;
+                      if (value.trim().isNotEmpty) {
+                        _expandedNotes.add(question.code);
+                      }
+                    });
+                  },
+                ),
+              )
+            else
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _expandedNotes.add(question.code);
+                    });
+                  },
+                  icon: const Icon(Icons.add_comment_outlined, size: 18),
+                  label: const Text('Add note'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF1F579C),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 8,
+                    ),
                   ),
                 ),
-                maxLines: 3,
-                minLines: 2,
-                onChanged: (value) {
-                  setState(() {
-                    _comments[question.code] = value;
-                  });
-                },
               ),
-            ),
           ],
         ),
       ),
@@ -411,17 +454,17 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
                 duration: const Duration(milliseconds: 200),
                 height: 44,
                 decoration: BoxDecoration(
+                color: isSelected
+                    ? _getOptionColor(option)
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
                   color: isSelected
-                      ? const Color(0xFF2C3E6B)
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isSelected
-                        ? const Color(0xFF2C3E6B)
-                        : const Color(0xFFD5D8E0),
-                    width: 1.5,
-                  ),
+                      ? _getOptionColor(option)
+                      : const Color(0xFFD5D8E0),
+                  width: 1.5,
                 ),
+              ),
                 alignment: Alignment.center,
                 child: Text(
                   displayLabel,
@@ -501,7 +544,7 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
                       }
                     },
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF1E2A47),
+                      backgroundColor: const Color(0xFF1F579C),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
