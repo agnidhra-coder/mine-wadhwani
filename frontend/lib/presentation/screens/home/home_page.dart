@@ -5,6 +5,8 @@ import 'package:mine_wadhwani/core/routing/app_router.gr.dart';
 import 'package:mine_wadhwani/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:mine_wadhwani/presentation/bloc/auth_bloc/auth_event.dart';
 import 'package:mine_wadhwani/presentation/bloc/auth_bloc/auth_state.dart';
+import 'package:mine_wadhwani/presentation/screens/notifications/notification_screen.dart';
+import 'package:mine_wadhwani/presentation/screens/profile/profile_screen.dart';
 
 @RoutePage()
 class HomePage extends StatefulWidget {
@@ -317,8 +319,21 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(width: 12),
 
             // Notification bell
-            const Icon(Icons.notifications_outlined,
-                color: Colors.white, size: 24),
+            IconButton(
+              icon: const Icon(
+                Icons.notifications_outlined,
+                color: Colors.white,
+                size: 24,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const NotificationScreen(),
+                  ),
+                );
+              },
+            ),
 
             const SizedBox(width: 12),
 
@@ -435,6 +450,18 @@ class _HomePageState extends State<HomePage> {
               onSelected: (value) {
                 if (value == 'logout') {
                   context.read<AuthBloc>().add(const AuthLogoutRequested());
+                } else if (value == 'profile') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ProfileScreen(
+                        name: userName,
+                        role: userRole,
+                        email: "user@email.com", // static for now
+                        phone: "+91 9876543210", // static for now
+                      ),
+                    ),
+                  );
                 }
               },
               child: CircleAvatar(
