@@ -11,6 +11,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   url_launcher: ^6.2.5
+  image_picker: ^1.1.2
 
   # State Management
   flutter_bloc: ^9.1.0
@@ -27,7 +28,6 @@ dependencies:
 
   # Routing
   auto_route: ^9.2.2
-  image_picker: ^1.1.2
 
   # Functional Error Handling
   dartz: ^0.10.1
