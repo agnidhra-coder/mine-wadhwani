@@ -356,8 +356,16 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mine_wadhwani/core/di/injection_container.dart';
 import 'package:mine_wadhwani/core/theme/app_colors.dart';
 import 'package:mine_wadhwani/core/theme/app_text_styles.dart';
+import 'package:mine_wadhwani/data/models/checklist/checklist_model.dart';
+import 'package:mine_wadhwani/presentation/bloc/auth_bloc/auth_bloc.dart';
+import 'package:mine_wadhwani/presentation/bloc/auth_bloc/auth_state.dart';
+import 'package:mine_wadhwani/presentation/bloc/checklist_bloc/checklist_bloc.dart';
+import 'package:mine_wadhwani/presentation/bloc/checklist_bloc/checklist_event.dart';
+import 'package:mine_wadhwani/presentation/bloc/checklist_bloc/checklist_state.dart';
 import 'package:mine_wadhwani/presentation/screens/stockpile/stockpile_checklist_page.dart';
 import 'package:mine_wadhwani/presentation/screens/stockpile/stockpile_data.dart';
 
@@ -468,49 +476,144 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
     final totalAnswered = _totalAnswered();
     final totalQuestions = _totalQuestions();
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      extendBodyBehindAppBar: false,
-      body: Column(
-        children: [
-          _buildHeader(context, totalAnswered, totalQuestions),
-          Expanded(
-            child: SingleChildScrollView(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 4),
-                  Text(
-                    'CHECKLIST SECTIONS',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.secondary.withValues(alpha: 0.7),
-                      letterSpacing: 1.0,
+    return BlocProvider(
+      create: (_) => sl<ChecklistBloc>(),
+      child: BlocConsumer<ChecklistBloc, ChecklistState>(
+        listener: (context, state) {
+          if (state is ChecklistSubmitted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Stockpile Inspection Submitted!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+            context.router.maybePop();
+          } else if (state is ChecklistError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          final isSubmitting = state is ChecklistSubmitting;
+
+          return Scaffold(
+            backgroundColor: const Color(0xFFF5F7FA),
+            extendBodyBehindAppBar: false,
+            body: Column(
+              children: [
+                _buildHeader(context, totalAnswered, totalQuestions),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 4),
+                        Text(
+                          'CHECKLIST SECTIONS',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.secondary.withValues(alpha: 0.7),
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ...List.generate(_sections.length, (index) {
+                          final section = _sections[index];
+                          final answered = _answeredInSection(section);
+                          final total = section.questions.length;
+                          return _buildSectionCard(
+                            context: context,
+                            index: index,
+                            section: section,
+                            answered: answered,
+                            total: total,
+                          );
+                        }),
+                        const SizedBox(height: 24),
+                        if (totalAnswered == totalQuestions)
+                          SizedBox(
+                            width: double.infinity,
+                            height: 56,
+                            child: FilledButton(
+                              onPressed: isSubmitting
+                                  ? null
+                                  : () {
+                                      _submitInspection(context);
+                                    },
+                              style: FilledButton.styleFrom(
+                                backgroundColor: const Color(0xFF1E2A47),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              child: isSubmitting
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white,
+                                    )
+                                  : const Text(
+                                      'SUBMIT INSPECTION',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 1.2,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        const SizedBox(height: 40),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  ...List.generate(_sections.length, (index) {
-                    final section = _sections[index];
-                    final answered = _answeredInSection(section);
-                    final total = section.questions.length;
-                    return _buildSectionCard(
-                      context: context,
-                      index: index,
-                      section: section,
-                      answered: answered,
-                      total: total,
-                    );
-                  }),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
+  }
+
+  void _submitInspection(BuildContext context) {
+    // Map StockpileData into ChecklistModel so ChecklistBloc can submit it
+    final checklistData = <ChecklistModel>[];
+
+    for (final section in _sections) {
+      for (final q in section.questions) {
+        checklistData.add(ChecklistModel(
+          mainTopic: section.title,
+          subTopic: '',
+          questionCode: q.code,
+          questionText: q.text,
+          answer: _answers[q.code] ?? '',
+          imageUrls: _mediaFiles[q.code] ?? [],
+        ));
+      }
+    }
+
+    final authState = context.read<AuthBloc>().state;
+    final supervisorId =
+        authState is Authenticated ? authState.user.id : '';
+
+    // First load the generated checklist into the Bloc
+    context.read<ChecklistBloc>().add(SetCustomChecklistData(checklistData));
+
+    context.read<ChecklistBloc>().add(
+          SubmitChecklist(
+            supervisorId: supervisorId,
+            mineName: widget.mineName,
+            mineType: widget.mineType,
+            area: widget.area,
+            shift: widget.shift,
+            inspectionType: widget.inspectionType,
+          ),
+        );
   }
 
   Widget _buildHeader(BuildContext context, int answered, int total) {
