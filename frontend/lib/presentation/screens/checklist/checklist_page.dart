@@ -1,11 +1,15 @@
+import 'dart:typed_data';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mine_wadhwani/core/di/injection_container.dart';
 import 'package:mine_wadhwani/core/theme/app_colors.dart';
 import 'package:mine_wadhwani/core/theme/app_text_styles.dart';
 import 'package:mine_wadhwani/data/models/checklist/checklist_model.dart';
+import 'package:mine_wadhwani/data/models/checklist/pending_image.dart';
 import 'package:mine_wadhwani/presentation/bloc/checklist_bloc/checklist_bloc.dart';
 import 'package:mine_wadhwani/presentation/bloc/checklist_bloc/checklist_event.dart';
 import 'package:mine_wadhwani/presentation/bloc/checklist_bloc/checklist_state.dart';
@@ -274,6 +278,10 @@ class _ChecklistPageState extends State<ChecklistPage> {
 
   Widget _buildQuestionCard(ChecklistModel question, BuildContext context) {
     final hasAnswer = question.answer.isNotEmpty;
+    final checklistState = context.watch<ChecklistBloc>().state;
+    final List<PendingImage> pendingImages = checklistState is ChecklistLoaded
+        ? (checklistState.pendingImages[question.questionCode]?.cast<PendingImage>() ?? <PendingImage>[])
+        : <PendingImage>[];
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -386,6 +394,213 @@ class _ChecklistPageState extends State<ChecklistPage> {
                         ),
                       );
                 },
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Image thumbnails (pending local images)
+            if (pendingImages.isNotEmpty) ...[
+              SizedBox(
+                height: 80,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: pendingImages.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  itemBuilder: (context, index) {
+                    return Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.memory(
+                            pendingImages[index].bytes,
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Positioned(
+                          top: 2,
+                          right: 2,
+                          child: GestureDetector(
+                            onTap: () {
+                              context.read<ChecklistBloc>().add(
+                                    RemoveLocalImage(
+                                      questionCode: question.questionCode,
+                                      imageIndex: index,
+                                    ),
+                                  );
+                            },
+                            child: Container(
+                              width: 22,
+                              height: 22,
+                              decoration: const BoxDecoration(
+                                color: Colors.black54,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.close,
+                                color: Colors.white,
+                                size: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+
+            // Add Media button
+            _buildAddMediaButton(question, context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickImages(
+      ChecklistModel question, BuildContext context) async {
+    final picker = ImagePicker();
+
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.outline.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Select Image Source',
+                style: AppTextStyles.titleLarge.copyWith(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2C3E6B).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.camera_alt_rounded,
+                      color: Color(0xFF2C3E6B)),
+                ),
+                title: const Text('Camera',
+                    style: TextStyle(fontWeight: FontWeight.w500)),
+                subtitle: const Text('Take a photo'),
+                onTap: () => Navigator.pop(ctx, ImageSource.camera),
+              ),
+              ListTile(
+                leading: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2C3E6B).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.photo_library_rounded,
+                      color: Color(0xFF2C3E6B)),
+                ),
+                title: const Text('Gallery',
+                    style: TextStyle(fontWeight: FontWeight.w500)),
+                subtitle: const Text('Choose from gallery'),
+                onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (source == null || !context.mounted) return;
+
+    List<XFile> xFiles = [];
+
+    if (source == ImageSource.gallery) {
+      xFiles = await picker.pickMultiImage(
+        imageQuality: 80,
+        maxWidth: 1920,
+      );
+    } else {
+      final image = await picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 80,
+        maxWidth: 1920,
+      );
+      if (image != null) {
+        xFiles = [image];
+      }
+    }
+
+    if (xFiles.isNotEmpty && context.mounted) {
+      // Read bytes from each XFile for cross-platform display
+      final pendingImages = <PendingImage>[];
+      for (final xFile in xFiles) {
+        final bytes = await xFile.readAsBytes();
+        pendingImages.add(PendingImage(filePath: xFile.path, bytes: Uint8List.fromList(bytes)));
+      }
+
+      if (context.mounted) {
+        context.read<ChecklistBloc>().add(
+              AddLocalImages(
+                questionCode: question.questionCode,
+                images: pendingImages,
+              ),
+            );
+      }
+    }
+  }
+
+  Widget _buildAddMediaButton(
+      ChecklistModel question, BuildContext context) {
+    return GestureDetector(
+      onTap: () => _pickImages(question, context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF5F7FA),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: const Color(0xFFD5D8E0),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.add_a_photo_rounded,
+              size: 18,
+              color: Color(0xFF2C3E6B),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Add Media',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF2C3E6B).withValues(alpha: 0.85),
               ),
             ),
           ],

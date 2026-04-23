@@ -35,6 +35,9 @@ const save_data = async (req, res) => {
       Inspection_type,
       Inspector_id,
       checklistData,
+      date,
+      startTime,
+      endTime,
     } = req.body;
     if (!mine_name) {
       return res
@@ -74,20 +77,29 @@ const save_data = async (req, res) => {
           .json(ApiResponse.error("checklistData must be an array", 400));
       }
     }
+    
+    // Convert dates if provided, else use current time
+    const formDate = date ? new Date(date) : new Date();
+    const formStartTime = startTime ? new Date(startTime) : new Date();
+    const formEndTime = endTime ? new Date(endTime) : new Date();
+
     const Question = await QuestionModel.create({
       mine_name,
       mine_type,
       area,
       shift,
+      date: formDate,
       Inspection_type,
       Inspector_id,
       checklistData,
-      startTime: new Date().toISOString(),
+      startTime: formStartTime,
+      endTime: formEndTime,
     });
+    
     console.log(Question);
     return res
       .status(201)
-      .json(ApiResponse.success(null, "Form data saved successfully", 201));
+      .json(ApiResponse.success(Question, "Form data saved successfully", 201));
   } catch (error) {
     console.error("Error saving form data:", error);
     return res
@@ -98,4 +110,127 @@ const save_data = async (req, res) => {
   }
 };
 
-export { get_form_data, save_data };
+const get_saved_data = async (req, res) => {
+  try {
+    const { mine_name, shift, Inspection_type, date, Inspector_id } = req.query;
+    
+    const query = {};
+    if (mine_name) query.mine_name = mine_name;
+    if (shift) query.shift = Number(shift);
+    if (Inspection_type) query.Inspection_type = Inspection_type;
+    if (Inspector_id) query.Inspector_id = Inspector_id;
+    if (date) {
+      // Ensure date comparison covers the whole day if required, or strict equality
+      const queryDate = new Date(date);
+      queryDate.setHours(0,0,0,0);
+      const nextDate = new Date(queryDate);
+      nextDate.setDate(nextDate.getDate() + 1);
+      query.date = { $gte: queryDate, $lt: nextDate };
+    }
+
+    const forms = await QuestionModel.find(query);
+    
+    return res
+      .status(200)
+      .json(ApiResponse.success(forms, "Saved forms fetched successfully", 200));
+  } catch (error) {
+    console.error("Error fetching saved forms:", error);
+    return res
+      .status(500)
+      .json(
+        ApiResponse.error(`Error in fetching saved forms: ${error.message}`, 500),
+      );
+  }
+};
+
+
+const upload_media = async (req, res) => {
+  try {
+    const { inspectionId, questionIndex } = req.params;
+
+    // --- basic param checks ---
+    if (!inspectionId) {
+      return res
+        .status(400)
+        .json(ApiResponse.error("inspectionId is required", 400));
+    }
+
+    const qIdx = Number(questionIndex);
+    if (isNaN(qIdx) || qIdx < 0) {
+      return res
+        .status(400)
+        .json(ApiResponse.error("questionIndex must be a non-negative number", 400));
+    }
+
+    // --- files check ---
+    if (!req.files || req.files.length === 0) {
+      return res
+        .status(400)
+        .json(ApiResponse.error("At least one image file is required", 400));
+    }
+
+    // --- fetch inspection document ---
+    const inspection = await QuestionModel.findById(inspectionId);
+    if (!inspection) {
+      return res
+        .status(404)
+        .json(ApiResponse.error("Inspection not found", 404));
+    }
+
+    if (qIdx >= inspection.checklistData.length) {
+      return res
+        .status(400)
+        .json(
+          ApiResponse.error(
+            `questionIndex ${qIdx} is out of bounds. This inspection has ${inspection.checklistData.length} questions.`,
+            400,
+          ),
+        );
+    }
+
+    // --- upload all files to Cloudinary in parallel ---
+    const { uploadToCloudinary } = await import("../Utils/cloudinary.js");
+
+    const uploadPromises = req.files.map((file) =>
+      uploadToCloudinary(file.buffer, {
+        folder: `mine-inspections/${inspectionId}`,
+        public_id: `q${qIdx}_${Date.now()}_${Math.round(Math.random() * 1000)}`,
+      }),
+    );
+
+    const uploadResults = await Promise.all(uploadPromises);
+    const imageUrls = uploadResults.map((r) => r.secure_url);
+
+    // --- push URLs into the specific question's imageUrl array ---
+    const updatePath = `checklistData.${qIdx}.imageUrl`;
+
+    const updatedInspection = await QuestionModel.findByIdAndUpdate(
+      inspectionId,
+      { $push: { [updatePath]: { $each: imageUrls } } },
+      { new: true },
+    );
+
+    return res.status(200).json(
+      ApiResponse.success(
+        {
+          uploadedUrls: imageUrls,
+          question: updatedInspection.checklistData[qIdx],
+        },
+        "Images uploaded successfully",
+        200,
+      ),
+    );
+  } catch (error) {
+    console.error("Error uploading media:", error);
+    return res
+      .status(500)
+      .json(
+        ApiResponse.error(
+          `Error uploading media: ${error.message}`,
+          500,
+        ),
+      );
+  }
+};
+
+export { get_form_data, save_data, get_saved_data, upload_media };

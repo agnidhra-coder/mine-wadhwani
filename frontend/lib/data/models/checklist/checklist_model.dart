@@ -8,6 +8,7 @@ class ChecklistModel extends ChecklistEntity {
     required super.questionText,
     super.answer,
     super.comment,
+    super.imageUrls,
   });
 
   factory ChecklistModel.fromJson(Map<String, dynamic> json) {
@@ -18,6 +19,10 @@ class ChecklistModel extends ChecklistEntity {
       questionText: json['question_text'] as String? ?? '',
       answer: json['answer'] as String? ?? '',
       comment: json['comment'] as String? ?? '',
+      imageUrls: (json['imageUrl'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
     );
   }
 
@@ -29,6 +34,7 @@ class ChecklistModel extends ChecklistEntity {
       'questionText': questionText,
       'answer': answer,
       'comment': comment,
+      'imageUrl': imageUrls,
     };
   }
 
@@ -39,6 +45,7 @@ class ChecklistModel extends ChecklistEntity {
     String? questionText,
     String? answer,
     String? comment,
+    List<String>? imageUrls,
   }) {
     return ChecklistModel(
       questionCode: questionCode ?? this.questionCode,
@@ -47,6 +54,7 @@ class ChecklistModel extends ChecklistEntity {
       questionText: questionText ?? this.questionText,
       answer: answer ?? this.answer,
       comment: comment ?? this.comment,
+      imageUrls: imageUrls ?? this.imageUrls,
     );
   }
 }
