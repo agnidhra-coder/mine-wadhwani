@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:equatable/equatable.dart';
 import 'package:mine_wadhwani/data/models/checklist/checklist_model.dart';
 import 'package:mine_wadhwani/data/models/checklist/pending_image.dart';
