@@ -198,6 +198,7 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
                                   area: widget.area,
                                   shift: int.parse(_selectedShift!),
                                   inspectionType: _selectedInspectionType!,
+                                  company: widget.company,
                                 ));
                               } else {
                                 context.router.push(ChecklistOverviewRoute(
