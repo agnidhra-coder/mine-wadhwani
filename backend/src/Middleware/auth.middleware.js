@@ -19,6 +19,7 @@ const auth_middleware = async (req, res, next) => {
         .status(401)
         .json(ApiResponse.error(`No authorization token provided`, 401));
     }
+    console.log("process.env.Authentication_for_jsonwebtoken:", process.env.Authentication_for_jsonwebtoken);
     const decoded = jwt.verify(
       token,
       process.env.Authentication_for_jsonwebtoken,

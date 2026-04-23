@@ -61,6 +61,7 @@ const RegisterUser = async (req, res) => {
         .json(ApiResponse.error("Server issue while creating user", 500));
     }
 
+    console.log("process.env.Authentication_for_jsonwebtoken:", process.env.Authentication_for_jsonwebtoken);
     const jwtToken = jwt.sign(
       { email: createduser.email, _id: createduser._id },
       process.env.Authentication_for_jsonwebtoken,
@@ -122,6 +123,7 @@ const LoginUser = async (req, res) => {
     if (!isPasswordCorrect) {
       return res.status(401).json(ApiResponse.error("Invalid password", 401));
     }
+    console.log("process.env.Authentication_for_jsonwebtoken:", process.env.Authentication_for_jsonwebtoken);
     const jwtToken = jwt.sign(
       { email: user.email, _id: user._id },
       process.env.Authentication_for_jsonwebtoken,
