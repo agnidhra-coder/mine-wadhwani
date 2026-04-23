@@ -158,6 +158,33 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
     final totalAnswered = _totalAnswered();
     final totalQuestions = _totalQuestions();
 
+<<<<<<< HEAD
+=======
+ ui-layout-enhancement
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
+      extendBodyBehindAppBar: false,
+      bottomNavigationBar: _buildStickyFooter(context),
+      body: Column(
+        children: [
+          _buildHeader(context, totalAnswered, totalQuestions),
+          Expanded(
+            child: SingleChildScrollView(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 4),
+                  Text(
+                    'CHECKLIST SECTIONS',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.secondary.withValues(alpha: 0.7),
+                      letterSpacing: 1.0,
+
+>>>>>>> cb626c982bab4beace84fde40b013f15c07112ee
     return BlocProvider(
       create: (_) => sl<ChecklistBloc>(),
       child: BlocConsumer<ChecklistBloc, ChecklistState>(
@@ -253,6 +280,10 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
 
                         const SizedBox(height: 40),
                       ],
+<<<<<<< HEAD
+=======
+ main
+>>>>>>> cb626c982bab4beace84fde40b013f15c07112ee
                     ),
                   ),
                 ),
