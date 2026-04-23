@@ -2225,6 +2225,7 @@
 // }
 
 import 'dart:io';
+import 'package:flutter/foundation.dart'; // added for kIsWeb
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -3084,12 +3085,19 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(10),
-                        child: Image.file(
-                          File(mediaList[i]),
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                        ),
+                        child: kIsWeb
+                            ? Image.network(
+                                mediaList[i],
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.file(
+                                File(mediaList[i]),
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.cover,
+                              ),
                       ),
                       Positioned(
                         top: 3,

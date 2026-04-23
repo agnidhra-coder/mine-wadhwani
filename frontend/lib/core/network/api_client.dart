@@ -57,6 +57,22 @@ class ApiClient {
     }
   }
 
+  /// Sends a multipart/form-data POST request (used for file uploads).
+  Future<Response> multipartPost(
+    String path, {
+    required FormData data,
+  }) async {
+    try {
+      return await _dio.post(
+        path,
+        data: data,
+        options: Options(contentType: 'multipart/form-data'),
+      );
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   ServerException _handleError(DioException error) {
     final response = error.response;
     if (response != null && response.data is Map<String, dynamic>) {

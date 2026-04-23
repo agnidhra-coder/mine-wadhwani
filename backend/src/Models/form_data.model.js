@@ -1,4 +1,5 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
+
 const Question_schema = new mongoose.Schema(
   {
     mine_name: {
@@ -17,7 +18,12 @@ const Question_schema = new mongoose.Schema(
     shift: {
       type: Number,
       enum: [1, 2, 3],
-      initial: -1,
+      required: true,
+    },
+    date: {
+      type: Date,
+      required: true,
+      default: Date.now,
     },
     Inspection_type: {
       type: String,
@@ -36,24 +42,31 @@ const Question_schema = new mongoose.Schema(
         questionText: String,
         answer: {
           type: String,
-          enum: ["YES", "NO", "NA"],
         },
         comment: String,
+        imageUrl:[String]
       },
     ],
     startTime: {
       type: Date,
       required: true,
     },
+    endTime: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     timestamps: true,
   },
 );
+
+// Create compound index to ensure one submitted inspection per user, for a specific mine, shift, and date 
 Question_schema.index(
-  { mineId: 1, operationalDate: 1, shiftNumber: 1 },
+  { mine_name: 1, shift: 1, Inspection_type: 1, date: 1, Inspector_id: 1 },
   { unique: true },
 );
+
 export const QuestionModel = mongoose.model("Question", Question_schema);
 
 export default QuestionModel;
