@@ -2849,17 +2849,7 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 11, vertical: 7),
-                    decoration: BoxDecoration(
-                      color: (showNoteField || isSaved)
-                          ? _headerColor.withValues(alpha: 0.08)
-                          : const Color(0xFFF5F7FA),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: (showNoteField || isSaved)
-                            ? _headerColor.withValues(alpha: 0.3)
-                            : const Color(0xFFE0E3EA),
-                      ),
-                    ),
+                    decoration: const BoxDecoration(),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -2870,17 +2860,17 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
                                   ? Icons.notes_outlined
                                   : Icons.add_comment_outlined),
                           size: 15,
-                          color: _headerColor,
+                          color: const Color(0xFF6B7280),
                         ),
                         const SizedBox(width: 5),
                         Text(
                           isSaved
                               ? 'Edit note'
                               : (showNoteField ? 'Adding note…' : 'Add note'),
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: _headerColor),
+                              color: Color(0xFF6B7280)),
                         ),
                       ],
                     ),
@@ -2895,17 +2885,7 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 11, vertical: 7),
-                    decoration: BoxDecoration(
-                      color: mediaCount > 0
-                          ? const Color(0xFF10B981).withValues(alpha: 0.08)
-                          : const Color(0xFFF5F7FA),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: mediaCount > 0
-                            ? const Color(0xFF10B981).withValues(alpha: 0.4)
-                            : const Color(0xFFE0E3EA),
-                      ),
-                    ),
+                    decoration: const BoxDecoration(),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -2913,7 +2893,7 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
                             size: 15,
                             color: mediaCount > 0
                                 ? const Color(0xFF10B981)
-                                : AppColors.secondary),
+                                : const Color(0xFF6B7280)),
                         const SizedBox(width: 5),
                         Text(
                           mediaCount > 0 ? 'Media ($mediaCount)' : 'Media',
@@ -2922,7 +2902,7 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
                               fontWeight: FontWeight.w600,
                               color: mediaCount > 0
                                   ? const Color(0xFF10B981)
-                                  : AppColors.secondary),
+                                  : const Color(0xFF6B7280)),
                         ),
                       ],
                     ),
@@ -2942,22 +2922,18 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 11, vertical: 7),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5F7FA),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xFFE0E3EA)),
-                    ),
+                    decoration: const BoxDecoration(),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.bolt_outlined,
-                            size: 15, color: AppColors.secondary),
+                        const Icon(Icons.bolt_outlined,
+                            size: 15, color: Color(0xFF6B7280)),
                         const SizedBox(width: 5),
-                        Text('Action',
+                        const Text('Action',
                             style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.secondary)),
+                                color: Color(0xFF6B7280))),
                       ],
                     ),
                   ),
@@ -3250,7 +3226,7 @@ class _StockpileChecklistPageState extends State<StockpileChecklistPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(isLast ? 'DONE' : 'SAVE & NEXT',
+                        Text(isLast ? 'FINISH' : 'SAVE & NEXT',
                             style: const TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 14,

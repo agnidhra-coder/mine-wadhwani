@@ -368,6 +368,10 @@ import 'package:mine_wadhwani/presentation/bloc/checklist_bloc/checklist_event.d
 import 'package:mine_wadhwani/presentation/bloc/checklist_bloc/checklist_state.dart';
 import 'package:mine_wadhwani/presentation/screens/stockpile/stockpile_checklist_page.dart';
 import 'package:mine_wadhwani/presentation/screens/stockpile/stockpile_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mine_wadhwani/presentation/bloc/auth_bloc/auth_bloc.dart';
+import 'package:mine_wadhwani/presentation/bloc/auth_bloc/auth_state.dart';
+import 'package:mine_wadhwani/presentation/screens/stockpile/stockpile_compliance_page.dart';
 
 enum _OverviewMenuOption { saveDraft, exitInspection }
 
@@ -378,6 +382,7 @@ class StockpileOverviewPage extends StatefulWidget {
   final String area;
   final int shift;
   final String inspectionType;
+  final String company;
 
   const StockpileOverviewPage({
     super.key,
@@ -386,6 +391,7 @@ class StockpileOverviewPage extends StatefulWidget {
     required this.area,
     required this.shift,
     required this.inspectionType,
+    required this.company,
   });
 
   @override
@@ -396,8 +402,6 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
   final List<StockpileSection> _sections = StockpileData.sections;
   final Map<String, String> _answers = {};
   final Map<String, String> _comments = {};
-
-  /// Persisted media across section visits: code → list of image paths
   final Map<String, List<String>> _mediaFiles = {};
 
   static const _headerColor = Color(0xFF1F579C);
@@ -458,6 +462,8 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
   int _totalQuestions() =>
       _sections.fold(0, (sum, s) => sum + s.questions.length);
 
+  bool get _hasAnyAnswer => _answers.values.any((v) => v.isNotEmpty);
+
   void _handleMenuOption(_OverviewMenuOption option) {
     switch (option) {
       case _OverviewMenuOption.saveDraft:
@@ -475,6 +481,30 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
   Widget build(BuildContext context) {
     final totalAnswered = _totalAnswered();
     final totalQuestions = _totalQuestions();
+
+ ui-layout-enhancement
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
+      extendBodyBehindAppBar: false,
+      bottomNavigationBar: _buildStickyFooter(context),
+      body: Column(
+        children: [
+          _buildHeader(context, totalAnswered, totalQuestions),
+          Expanded(
+            child: SingleChildScrollView(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 4),
+                  Text(
+                    'CHECKLIST SECTIONS',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.secondary.withValues(alpha: 0.7),
+                      letterSpacing: 1.0,
 
     return BlocProvider(
       create: (_) => sl<ChecklistBloc>(),
@@ -569,6 +599,7 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
                           ),
                         const SizedBox(height: 40),
                       ],
+ main
                     ),
                   ),
                 ),
@@ -627,8 +658,7 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
         children: [
           SizedBox(height: statusBarHeight),
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -659,12 +689,20 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
                         ),
                       ),
                       const SizedBox(height: 2),
-                      Text(
-                        'Select a section to begin inspection',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: Colors.white.withValues(alpha: 0.75),
-                          fontSize: 13,
-                        ),
+                      BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, state) {
+                          final user =
+                              state is Authenticated ? state.user : null;
+                          return Text(
+                            user != null
+                                ? 'Inspected by: ${user.name}  •  ${user.role}'
+                                : 'Select a section to begin inspection',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: Colors.white.withValues(alpha: 0.75),
+                              fontSize: 13,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -761,6 +799,137 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
     );
   }
 
+  Widget _buildStickyFooter(BuildContext context) {
+    final enabled = _hasAnyAnswer;
+
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Divider(
+              color: Color(0xFFE0E3EA),
+              height: 1,
+              thickness: 1,
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                // Save Draft
+                Expanded(
+                  child: SizedBox(
+                    height: 50,
+                    child: OutlinedButton.icon(
+                      onPressed: enabled
+                          ? () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Draft saved')),
+                              );
+                            }
+                          : null,
+                      icon: Icon(
+                        Icons.save_outlined,
+                        size: 18,
+                        color: enabled
+                            ? _headerColor
+                            : const Color(0xFFBDBDBD),
+                      ),
+                      label: Text(
+                        'Save Draft',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.3,
+                          color: enabled
+                              ? _headerColor
+                              : const Color(0xFFBDBDBD),
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: enabled
+                              ? _headerColor
+                              : const Color(0xFFE0E3EA),
+                          width: 1.5,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        backgroundColor: enabled
+                            ? _headerColor.withValues(alpha: 0.05)
+                            : const Color(0xFFF5F7FA),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Review & Complete
+                Expanded(
+                  child: SizedBox(
+                    height: 50,
+                    child: FilledButton.icon(
+                      onPressed: enabled
+                          ? () {
+                              final authState = context.read<AuthBloc>().state;
+                              final user = authState is Authenticated ? authState.user : null;
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => StockpileCompliancePage(
+                                    company: widget.company,
+                                    mineName: widget.mineName,
+                                    mineType: widget.mineType,
+                                    area: widget.area,
+                                    shift: widget.shift,
+                                    inspectionType: widget.inspectionType,
+                                    sections: _sections,
+                                    answers: Map.from(_answers),
+                                    comments: Map.from(_comments),
+                                    mediaFiles: Map.fromEntries(
+                                      _mediaFiles.entries.map(
+                                        (e) => MapEntry(e.key, List<String>.from(e.value)),
+                                      ),
+                                    ),
+                                    inspectorName: user?.name ?? '',
+                                    inspectorRole: user?.role ?? '',
+                                  ),
+                                ),
+                              );
+                            }
+                          : null,
+                      icon: const Icon(Icons.check_circle_outline, size: 18),
+                      label: const Text(
+                        'Complete Inspection',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: enabled
+                            ? _headerColor
+                            : const Color(0xFFE0E3EA),
+                        foregroundColor: enabled
+                            ? Colors.white
+                            : const Color(0xFFBDBDBD),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildSectionCard({
     required BuildContext context,
     required int index,
@@ -783,7 +952,6 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
                 sections: _sections,
                 answers: Map.from(_answers),
                 comments: Map.from(_comments),
-                // Pass a deep copy of media so checklist starts with existing photos
                 mediaFiles: Map.fromEntries(
                   _mediaFiles.entries.map(
                     (e) => MapEntry(e.key, List<String>.from(e.value)),
@@ -802,13 +970,10 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
             setState(() {
               for (final entry in result.entries) {
                 if (entry.key.startsWith('a:')) {
-                  // answers
                   _answers[entry.key.substring(2)] = entry.value;
                 } else if (entry.key.startsWith('c:')) {
-                  // comments
                   _comments[entry.key.substring(2)] = entry.value;
                 } else if (entry.key.startsWith('m:')) {
-                  // media — stored as pipe-separated paths
                   final code = entry.key.substring(2);
                   if (entry.value.isEmpty) {
                     _mediaFiles.remove(code);
