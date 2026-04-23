@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "start": "node index.js"
   },
   "author": "Vaibhav Aryan",
   "license": "ISC",
