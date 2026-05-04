@@ -20,7 +20,7 @@ class MineInfoPage extends StatelessWidget {
   static const Color greenAccent = Color(0xFF3DAA6E);
 
   // ── Replace with your actual mine info website URL ──────────────────
-  static const String _mineWebsiteUrl = 'https://bcclweb.in/?page_id=3681';
+  static const String _mineWebsiteUrl = 'https://bcclweb.in/?page_id=6322';
   // ────────────────────────────────────────────────────────────────────
 
   Future<void> _launchWebsite() async {
@@ -93,10 +93,10 @@ class MineInfoPage extends StatelessWidget {
                   _buildInfoCard([
                     _infoRow('Location', 'Dhanbad, Jharkhand'),
                     _infoRow('Established', '1972'),
-                    _infoRow('Total Area', '312 hectares'),
+                    _infoRow('Total Area', '2,500 - 3,500 hectares'),
                     _infoRow('Pit Depth', '~85 m (open pit)'),
-                    _infoRow('Coal Grade', 'Coking (Grade A)'),
-                    _infoRow('Annual Capacity', '1.8 MT'),
+                    _infoRow('Coal Grade', 'Coking'),
+                    _infoRow('Annual Capacity', '1.8 Million Tonnes'),
                     _infoRow('Regulatory Zone', 'DGMS Zone III'),
                     _infoRow('Safety Rating', 'B+ (Good)',
                         valueColor: greenAccent),
@@ -168,13 +168,19 @@ class MineInfoPage extends StatelessWidget {
                   _buildSectionTitle('Emergency Contacts'),
                   const SizedBox(height: 10),
                   _buildInfoCard([
-                    _infoRow('Mine Manager', 'R. K. Sharma · +91 94301 XXXXX',
+                    _infoRow('General Manager', 'Name · +91 94301 XXXXX',
                         valueColor: navyBlue),
-                    _infoRow('Safety Officer', 'P. Das · +91 98310 XXXXX',
+                    _infoRow('Project Officer', 'Name · +91 98310 XXXXX',
                         valueColor: navyBlue),
-                    _infoRow('Medical Centre', 'BCCL Hospital · Ext 401',
+                    _infoRow('Mine Manager', 'Name · +91 94301 XXXXX',
                         valueColor: navyBlue),
-                    _infoRow('Fire Station', 'Gate 2 · Ext 402',
+                    _infoRow('Safety Officer', 'Name · +91 94301 XXXXX',
+                        valueColor: navyBlue),
+                    _infoRow('Coal Station', 'not avalaible',
+                        valueColor: navyBlue),
+                    _infoRow('Medical Centre', 'not avalaible',
+                        valueColor: navyBlue),
+                    _infoRow('Fire Station', 'not avalaible',
                         valueColor: navyBlue),
                   ]),
                   const SizedBox(height: 20),
@@ -276,11 +282,10 @@ class MineInfoPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '$mineName is an ${mineType.toLowerCase()} coking coal mine operated by '
-            '$subsidiary under $company, located in Dhanbad, Jharkhand. '
-            'Established in 1972, it spans 312 hectares with a pit depth of ~85m '
-            'and an annual capacity of 1.8 MT. The mine currently holds a B+ safety '
-            'rating under DGMS Zone III. CURRENTLY IT IS FOR DEMO TEXT',
+            'The $mineName is an ${mineType.toLowerCase()} coking coal mine operated by '
+            '$subsidiary under $company, located in Dhanbad, Jharkhand. This area is part of the famous Jharia coalfield, known for high-quality coking coal used in steel production.'
+            ' The area has significant coal reserves of around 331 million tonnes, making it an important contributor to India’s coal production. The mines extract both metallurgical (coking) and thermal coal.'
+            ' However, Kusunda Area faces major challenges such as mine fires and land subsidence, which are common in the Jharia coalfield due to over a century of mining. ',
             style: TextStyle(
               fontSize: 13,
               color: Colors.grey[700],
@@ -290,10 +295,10 @@ class MineInfoPage extends StatelessWidget {
           const SizedBox(height: 14),
           const Divider(height: 1, thickness: 0.5),
           const SizedBox(height: 10),
-          _statRow(Icons.bar_chart_rounded, 'Daily Output', '4,200 MT'),
+          _statRow(Icons.bar_chart_rounded, 'Daily Output', '4,200 tonnes/day'),
           _statRow(Icons.track_changes_rounded, 'Monthly Target', '82% achieved'),
-          _statRow(Icons.people_rounded, 'Workers (Shift 1)', '214'),
-          _statRow(Icons.precision_manufacturing_rounded, 'Active Equipment', '18 / 22'),
+          _statRow(Icons.people_rounded, 'Workforce', '214 workers'),
+          _statRow(Icons.precision_manufacturing_rounded, 'Active Equipment', '5 Excavators, 20 Dumpers'),
         ],
       ),
     );
