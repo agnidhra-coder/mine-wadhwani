@@ -38,6 +38,9 @@ const save_data = async (req, res) => {
       date,
       startTime,
       endTime,
+      completed,
+      observations,
+      signature,
     } = req.body;
     if (!mine_name) {
       return res
@@ -94,6 +97,9 @@ const save_data = async (req, res) => {
       checklistData,
       startTime: formStartTime,
       endTime: formEndTime,
+      completed: completed === true,
+      observations: observations || '',
+      signature: signature || '',
     });
     
     console.log(Question);

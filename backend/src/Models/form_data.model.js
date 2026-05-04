@@ -44,9 +44,22 @@ const Question_schema = new mongoose.Schema(
           type: String,
         },
         comment: String,
-        imageUrl:[String]
+        imageUrl:[String],
+        action: String
       },
     ],
+    completed: {
+      type: Boolean,
+      default: false,
+    },
+    observations: {
+      type: String,
+      default: '',
+    },
+    signature: {
+      type: String,
+      default: '',
+    },
     startTime: {
       type: Date,
       required: true,
@@ -63,7 +76,7 @@ const Question_schema = new mongoose.Schema(
 
 // Create compound index to ensure one submitted inspection per user, for a specific mine, shift, and date 
 Question_schema.index(
-  { mine_name: 1, shift: 1, Inspection_type: 1, date: 1, Inspector_id: 1 },
+  { mine_name: 1, shift: 1, Inspection_type: 1, date: 1, Inspector_id: 1, completed: 1 },
   { unique: true },
 );
 

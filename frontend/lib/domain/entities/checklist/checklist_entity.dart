@@ -8,6 +8,7 @@ class ChecklistEntity extends Equatable {
   final String answer;
   final String comment;
   final List<String> imageUrls;
+  final String action;
 
   const ChecklistEntity({
     required this.questionCode,
@@ -17,6 +18,7 @@ class ChecklistEntity extends Equatable {
     this.answer = '',
     this.comment = '',
     this.imageUrls = const [],
+    this.action = '',
   });
 
   @override
@@ -28,5 +30,6 @@ class ChecklistEntity extends Equatable {
         answer,
         comment,
         imageUrls,
+        action,
       ];
 }

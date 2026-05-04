@@ -48,6 +48,9 @@ class SubmitChecklist extends ChecklistEvent {
   final String area;
   final int shift;
   final String inspectionType;
+  final bool completed;
+  final String observations;
+  final String signature;
 
   const SubmitChecklist({
     required this.supervisorId,
@@ -56,11 +59,14 @@ class SubmitChecklist extends ChecklistEvent {
     required this.area,
     required this.shift,
     required this.inspectionType,
+    required this.completed,
+    this.observations = '',
+    this.signature = '',
   });
 
   @override
   List<Object?> get props =>
-      [supervisorId, mineName, mineType, area, shift, inspectionType];
+      [supervisorId, mineName, mineType, area, shift, inspectionType, completed, observations, signature];
 }
 
 /// Fired when the user picks images for a specific question.

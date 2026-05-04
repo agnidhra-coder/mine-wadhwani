@@ -223,6 +223,9 @@ class ChecklistBloc extends Bloc<ChecklistEvent, ChecklistState> {
           date: now,
           startTime: startTime,
           endTime: now,
+          completed: event.completed,
+          observations: event.observations,
+          signature: event.signature,
         ),
       );
 

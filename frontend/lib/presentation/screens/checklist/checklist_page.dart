@@ -77,8 +77,8 @@ class _ChecklistPageState extends State<ChecklistPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: sl<ChecklistBloc>(),
+    return BlocProvider(
+      create: (_) => sl<ChecklistBloc>()..add(const FetchChecklist()),
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F7FA),
         body: BlocConsumer<ChecklistBloc, ChecklistState>(
@@ -762,6 +762,7 @@ class _ChecklistPageState extends State<ChecklistPage> {
                                       area: widget.area,
                                       shift: widget.shift,
                                       inspectionType: widget.inspectionType,
+                                      completed: true,
                                     ),
                                   );
                             } else {
