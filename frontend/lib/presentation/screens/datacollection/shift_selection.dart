@@ -22,7 +22,8 @@ class ShiftSelectionPage extends StatefulWidget {
   State<ShiftSelectionPage> createState() => _ShiftSelectionPageState();
 }
 
-class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
+class _ShiftSelectionPageState extends State<ShiftSelectionPage>
+    with SingleTickerProviderStateMixin {
   static const Color navyBlue = Color(0xFF1F579C);
   static const Color lightBg = Color(0xFFF5F7FA);
   static const Color greenAccent = Color(0xFF3DAA6E);
@@ -30,6 +31,10 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
   String? _selectedShift;
   String? _selectedInspectionType;
   bool _mineInfoReviewed = false;
+
+  // Animation controller for unlock reveal
+  late AnimationController _unlockController;
+  late Animation<double> _unlockAnimation;
 
   final List<Map<String, dynamic>> _shifts = [
     {'label': 'Shift 1', 'value': '1', 'time': '6:00 AM – 2:00 PM'},
@@ -53,7 +58,28 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
   ];
 
   bool get _canProceed =>
-      _selectedShift != null && _selectedInspectionType != null;
+      _mineInfoReviewed &&
+      _selectedShift != null &&
+      _selectedInspectionType != null;
+
+  @override
+  void initState() {
+    super.initState();
+    _unlockController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _unlockAnimation = CurvedAnimation(
+      parent: _unlockController,
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
+  void dispose() {
+    _unlockController.dispose();
+    super.dispose();
+  }
 
   void _openMineInfo() async {
     final reviewed = await Navigator.of(context).push<bool>(
@@ -66,10 +92,37 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
         ),
       ),
     );
-    if (reviewed == true) {
+    if (reviewed == true && !_mineInfoReviewed) {
       setState(() => _mineInfoReviewed = true);
+      _unlockController.forward(); // trigger unlock animation
     }
   }
+
+  /// Called when user taps a locked element — nudges them to review mine info first
+void _onLockedTap() {
+  ScaffoldMessenger.of(context).clearSnackBars();
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: const Row(
+        children: [
+          Icon(Icons.lock_rounded, color: Colors.white, size: 16),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Tap "View mine info" above to unlock.',
+              style: TextStyle(fontSize: 13),
+            ),
+          ),
+        ],
+      ),
+      backgroundColor: const Color(0xFF1A1A2E),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      margin: const EdgeInsets.all(16),
+      duration: const Duration(seconds: 3),
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -87,160 +140,266 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
                 children: [
                   _buildSummaryCard(),
                   const SizedBox(height: 24),
-                  _buildSectionHeader(
-                    icon: Icons.access_time_rounded,
-                    title: 'Shift & Inspection',
-                    subtitle: 'Select shift and type of inspection',
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'SHIFT',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: navyBlue,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: _shifts.map((shift) {
-                      final isSelected = _selectedShift == shift['value'];
-                      return Expanded(
-                        child: GestureDetector(
-                          onTap: () =>
-                              setState(() => _selectedShift = shift['value']),
-                          child: Container(
-                            margin: EdgeInsets.only(
-                              right: shift['value'] != '3' ? 10 : 0,
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 14, horizontal: 8),
-                            decoration: BoxDecoration(
-                              color: isSelected ? navyBlue : Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: isSelected
-                                    ? navyBlue
-                                    : Colors.grey.shade200,
-                                width: isSelected ? 2 : 1,
-                              ),
-                              boxShadow: isSelected
-                                  ? [
-                                      BoxShadow(
-                                        color: navyBlue.withValues(alpha: 0.2),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 3),
-                                      )
-                                    ]
-                                  : [],
-                            ),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.wb_sunny_rounded,
-                                  color: isSelected
-                                      ? Colors.white
-                                      : Colors.grey[400],
-                                  size: 20,
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  shift['label'],
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                    color: isSelected
-                                        ? Colors.white
-                                        : const Color(0xFF1A1A2E),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  shift['time'],
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 9,
-                                    color: isSelected
-                                        ? Colors.white60
-                                        : Colors.grey[500],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildDropdownCard(
-                    label: 'Inspection Type',
-                    hint: 'Select inspection type',
-                    icon: Icons.assignment_rounded,
-                    value: _selectedInspectionType,
-                    items: _inspectionTypes,
-                    onChanged: (val) =>
-                        setState(() => _selectedInspectionType = val),
-                  ),
+                  _buildShiftAndInspectionSection(),
                   const SizedBox(height: 32),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: _canProceed
-                          ? () {
-                              if (_selectedInspectionType ==
-                                  'Stockpile inspection') {
-                                context.router.push(StockpileOverviewRoute(
-                                  mineName: widget.mineName,
-                                  mineType: widget.mineType,
-                                  area: widget.area,
-                                  shift: int.parse(_selectedShift!),
-                                  inspectionType: _selectedInspectionType!,
-                                  company: widget.company,
-                                ));
-                              } else {
-                                context.router.push(ChecklistOverviewRoute(
-                                  mineName: widget.mineName,
-                                  mineType: widget.mineType,
-                                  area: widget.area,
-                                  shift: int.parse(_selectedShift!),
-                                  inspectionType: _selectedInspectionType!,
-                                ));
-                              }
-                            }
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: navyBlue,
-                        disabledBackgroundColor: Colors.grey.shade300,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Next',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Icon(Icons.arrow_forward_rounded, size: 20),
-                        ],
-                      ),
-                    ),
-                  ),
+                  _buildNextButton(),
                 ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// The shift + inspection section — locked behind mine info review
+  Widget _buildShiftAndInspectionSection() {
+    return AnimatedBuilder(
+      animation: _unlockAnimation,
+      builder: (context, child) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionHeader(
+              icon: Icons.access_time_rounded,
+              title: 'Shift & Inspection',
+              subtitle: 'Select shift and type of inspection',
+            ),
+            const SizedBox(height: 16),
+
+            // ── Lock banner (shown when not reviewed) ──────────────
+            if (!_mineInfoReviewed) _buildLockBanner(),
+
+            const SizedBox(height: 8),
+
+            // ── SHIFT LABEL ────────────────────────────────────────
+            Opacity(
+              opacity: _mineInfoReviewed
+                  ? 1.0
+                  : 0.38, // Material disabled opacity
+              child: const Text(
+                'SHIFT',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: navyBlue,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // ── SHIFT TILES ────────────────────────────────────────
+            _buildShiftRow(),
+
+            const SizedBox(height: 20),
+
+            // ── INSPECTION DROPDOWN ────────────────────────────────
+            _buildLockedDropdownCard(
+              label: 'Inspection Type',
+              hint: 'Select inspection type',
+              icon: Icons.assignment_rounded,
+              value: _selectedInspectionType,
+              items: _inspectionTypes,
+              onChanged: (val) =>
+                  setState(() => _selectedInspectionType = val),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Shown above the locked section to explain why it's disabled
+/// Clean banner — no duplicate button
+Widget _buildLockBanner() {
+  return Container(
+    width: double.infinity,
+    margin: const EdgeInsets.only(bottom: 12),
+    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+    decoration: BoxDecoration(
+      color: const Color(0xFFFFF8E1),
+      borderRadius: BorderRadius.circular(10),
+      border: Border.all(color: const Color(0xFFFFCC02), width: 1),
+    ),
+    child: Row(
+      children: const [
+        Icon(Icons.lock_outline_rounded,
+            size: 18, color: Color(0xFFF59E0B)),
+        SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            'Review mine information above to unlock shift & inspection selection.',
+            style: TextStyle(
+              fontSize: 12,
+              color: Color(0xFF92400E),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+  /// Shift row — tapping while locked shows a snackbar nudge
+  Widget _buildShiftRow() {
+    return GestureDetector(
+      onTap: _mineInfoReviewed ? null : _onLockedTap,
+      child: AbsorbPointer(
+        absorbing: !_mineInfoReviewed,
+        child: Opacity(
+          opacity: _mineInfoReviewed ? 1.0 : 0.38,
+          child: Row(
+            children: _shifts.map((shift) {
+              final isSelected = _selectedShift == shift['value'];
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () =>
+                      setState(() => _selectedShift = shift['value']),
+                  child: Container(
+                    margin: EdgeInsets.only(
+                      right: shift['value'] != '3' ? 10 : 0,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 14, horizontal: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected ? navyBlue : Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected
+                            ? navyBlue
+                            : Colors.grey.shade200,
+                        width: isSelected ? 2 : 1,
+                      ),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: navyBlue.withValues(alpha: 0.2),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              )
+                            ]
+                          : [],
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.wb_sunny_rounded,
+                          color: isSelected
+                              ? Colors.white
+                              : Colors.grey[400],
+                          size: 20,
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          shift['label'],
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: isSelected
+                                ? Colors.white
+                                : const Color(0xFF1A1A2E),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          shift['time'],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 9,
+                            color: isSelected
+                                ? Colors.white60
+                                : Colors.grey[500],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Dropdown that absorbs taps and shows a snackbar when locked
+  Widget _buildLockedDropdownCard({
+    required String label,
+    required String hint,
+    required IconData icon,
+    required String? value,
+    required List<String> items,
+    required void Function(String?) onChanged,
+  }) {
+    return GestureDetector(
+      onTap: _mineInfoReviewed ? null : _onLockedTap,
+      child: AbsorbPointer(
+        absorbing: !_mineInfoReviewed,
+        child: Opacity(
+          opacity: _mineInfoReviewed ? 1.0 : 0.38,
+          child: _buildDropdownCard(
+            label: label,
+            hint: hint,
+            icon: icon,
+            value: value,
+            items: items,
+            onChanged: onChanged,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNextButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: ElevatedButton(
+        onPressed: _canProceed
+            ? () {
+                if (_selectedInspectionType == 'Stockpile inspection') {
+                  context.router.push(StockpileOverviewRoute(
+                    mineName: widget.mineName,
+                    mineType: widget.mineType,
+                    area: widget.area,
+                    shift: int.parse(_selectedShift!),
+                    inspectionType: _selectedInspectionType!,
+                    company: widget.company,
+                  ));
+                } else {
+                  context.router.push(ChecklistOverviewRoute(
+                    mineName: widget.mineName,
+                    mineType: widget.mineType,
+                    area: widget.area,
+                    shift: int.parse(_selectedShift!),
+                    inspectionType: _selectedInspectionType!,
+                  ));
+                }
+              }
+            : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: navyBlue,
+          disabledBackgroundColor: Colors.grey.shade300,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          elevation: 0,
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Next',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(width: 8),
+            Icon(Icons.arrow_forward_rounded, size: 20),
+          ],
+        ),
       ),
     );
   }
@@ -303,9 +462,7 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
       decoration: BoxDecoration(
         color: navyBlue.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: navyBlue.withValues(alpha: 0.12),
-        ),
+        border: Border.all(color: navyBlue.withValues(alpha: 0.12)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -328,8 +485,6 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
           _summaryRow(Icons.category_rounded, 'Type', widget.mineType),
           const SizedBox(height: 6),
           _summaryRow(Icons.map_rounded, 'Mine', widget.area),
-
-          // ── View Mine Info row ──────────────────────────────────────
           const SizedBox(height: 12),
           const Divider(height: 1, thickness: 0.5),
           const SizedBox(height: 10),
@@ -345,7 +500,7 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
                 const SizedBox(width: 6),
                 Text(
                   _mineInfoReviewed
-                      ? 'Mine info reviewed'
+                      ? 'Mine info reviewed ✓'
                       : 'View mine info',
                   style: TextStyle(
                     fontSize: 12,
@@ -366,7 +521,6 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
               ],
             ),
           ),
-          // ────────────────────────────────────────────────────────────
         ],
       ),
     );
@@ -377,10 +531,8 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
       children: [
         Icon(icon, size: 14, color: navyBlue),
         const SizedBox(width: 8),
-        Text(
-          '$label: ',
-          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-        ),
+        Text('$label: ',
+            style: TextStyle(fontSize: 12, color: Colors.grey[600])),
         Expanded(
           child: Text(
             value,
@@ -416,18 +568,14 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1A2E),
-              ),
-            ),
-            Text(
-              subtitle,
-              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-            ),
+            Text(title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1A1A2E),
+                )),
+            Text(subtitle,
+                style: TextStyle(fontSize: 12, color: Colors.grey[600])),
           ],
         ),
       ],
@@ -492,10 +640,9 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage> {
           DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: value,
-              hint: Text(
-                hint,
-                style: TextStyle(color: Colors.grey[400], fontSize: 14),
-              ),
+              hint: Text(hint,
+                  style:
+                      TextStyle(color: Colors.grey[400], fontSize: 14)),
               isExpanded: true,
               icon: const Icon(Icons.keyboard_arrow_down_rounded,
                   color: navyBlue),

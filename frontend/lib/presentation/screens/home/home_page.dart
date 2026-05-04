@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
       iconBgColor: Color(0xFFFFE5E5),
       iconColor: Color(0xFFD9534F),
       accentColor: Color(0xFFD9534F),
-      title: 'Report Hazard',
+      title: 'Report Issue',
       description:
           'Immediate logging for critical risks, environmental hazards, or equipment failures.',
     ),
