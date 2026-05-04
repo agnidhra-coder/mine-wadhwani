@@ -17,6 +17,9 @@ abstract class ChecklistRepository {
     required String date,
     required String startTime,
     required String endTime,
+    required bool completed,
+    String observations = '',
+    String signature = '',
   });
 
   Future<Either<Failure, List<String>>> uploadMedia({

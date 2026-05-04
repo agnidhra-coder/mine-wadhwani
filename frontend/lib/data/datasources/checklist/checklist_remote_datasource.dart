@@ -19,6 +19,9 @@ abstract class ChecklistRemoteDataSource {
     required String date,
     required String startTime,
     required String endTime,
+    required bool completed,
+    String observations = '',
+    String signature = '',
   });
 
   /// Uploads images for a specific question within a saved inspection.
@@ -77,6 +80,9 @@ class ChecklistRemoteDataSourceImpl implements ChecklistRemoteDataSource {
     required String date,
     required String startTime,
     required String endTime,
+    required bool completed,
+    String observations = '',
+    String signature = '',
   }) async {
     try {
       final payload = {
@@ -90,6 +96,9 @@ class ChecklistRemoteDataSourceImpl implements ChecklistRemoteDataSource {
         'date': date,
         'startTime': startTime,
         'endTime': endTime,
+        'completed': completed,
+        'observations': observations,
+        'signature': signature,
       };
       debugPrint('SUBMIT PAYLOAD: $payload');
       final response = await apiClient.post(

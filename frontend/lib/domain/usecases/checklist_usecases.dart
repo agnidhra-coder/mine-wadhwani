@@ -35,6 +35,9 @@ class SubmitChecklistParams {
   final String date;
   final String startTime;
   final String endTime;
+  final bool completed;
+  final String observations;
+  final String signature;
 
   const SubmitChecklistParams({
     required this.supervisorId,
@@ -47,6 +50,9 @@ class SubmitChecklistParams {
     required this.date,
     required this.startTime,
     required this.endTime,
+    required this.completed,
+    this.observations = '',
+    this.signature = '',
   });
 }
 
@@ -68,6 +74,9 @@ class SubmitChecklistUseCase extends UseCase<String, SubmitChecklistParams> {
       date: params.date,
       startTime: params.startTime,
       endTime: params.endTime,
+      completed: params.completed,
+      observations: params.observations,
+      signature: params.signature,
     );
   }
 }

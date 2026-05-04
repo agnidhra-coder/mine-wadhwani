@@ -32,6 +32,9 @@ class ChecklistRepositoryImpl implements ChecklistRepository {
     required String date,
     required String startTime,
     required String endTime,
+    required bool completed,
+    String observations = '',
+    String signature = '',
   }) async {
     try {
       final inspectionId = await remoteDataSource.submitChecklist(
@@ -45,6 +48,9 @@ class ChecklistRepositoryImpl implements ChecklistRepository {
         date: date,
         startTime: startTime,
         endTime: endTime,
+        completed: completed,
+        observations: observations,
+        signature: signature,
       );
       return Right(inspectionId);
     } on ServerException catch (e) {

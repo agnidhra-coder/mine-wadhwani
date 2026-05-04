@@ -829,7 +829,7 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
     }
   }
 
-  void _submitInspection(BuildContext context) {
+  void _saveDraft(BuildContext context) {
     final checklistData = <ChecklistModel>[];
 
     for (final section in _sections) {
@@ -840,7 +840,9 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
           questionCode: q.code,
           questionText: q.text,
           answer: _answers[q.code] ?? '',
+          comment: _comments[q.code] ?? '',
           imageUrls: _mediaFiles[q.code] ?? [],
+          action: _actions[q.code] ?? '',
         ));
       }
     }
@@ -859,6 +861,7 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
             area: widget.area,
             shift: widget.shift,
             inspectionType: widget.inspectionType,
+            completed: false,
           ),
         );
   }
@@ -875,11 +878,10 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
           if (state is ChecklistSubmitted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Stockpile Inspection Submitted!'),
+                content: Text('Draft saved successfully!'),
                 backgroundColor: Colors.green,
               ),
             );
-            context.router.maybePop();
           } else if (state is ChecklistError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -890,8 +892,6 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
           }
         },
         builder: (context, state) {
-          final isSubmitting = state is ChecklistSubmitting;
-
           return Scaffold(
             backgroundColor: const Color(0xFFF5F7FA),
             extendBodyBehindAppBar: false,
@@ -929,38 +929,6 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
                             total: total,
                           );
                         }),
-                        const SizedBox(height: 24),
-
-                        // Auto-submit button when fully completed
-                        if (totalAnswered == totalQuestions)
-                          SizedBox(
-                            width: double.infinity,
-                            height: 56,
-                            child: FilledButton(
-                              onPressed: isSubmitting
-                                  ? null
-                                  : () => _submitInspection(context),
-                              style: FilledButton.styleFrom(
-                                backgroundColor: const Color(0xFF1E2A47),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              child: isSubmitting
-                                  ? const CircularProgressIndicator(
-                                      color: Colors.white,
-                                    )
-                                  : const Text(
-                                      'SUBMIT INSPECTION',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 1.2,
-                                      ),
-                                    ),
-                            ),
-                          ),
-
                         const SizedBox(height: 40),
                       ],
                     ),
@@ -1141,12 +1109,7 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
                     height: 50,
                     child: OutlinedButton.icon(
                       onPressed: enabled
-                          ? () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Draft saved')),
-                              );
-                            }
+                          ? () => _saveDraft(context)
                           : null,
                       icon: Icon(
                         Icons.save_outlined,
