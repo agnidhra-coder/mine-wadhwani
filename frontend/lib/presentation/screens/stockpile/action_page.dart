@@ -42,10 +42,8 @@ class ChecklistAction {
   static ChecklistAction? decode(String questionCode, String encoded) {
     final parts = encoded.split('|||');
     if (parts.length < 5) return null;
-    DateTime? dueDate;
     if (parts[3].isNotEmpty) {
       try {
-        dueDate = DateTime.parse(parts[3]);
       } catch (_) {}
     }
     return ChecklistAction(
