@@ -74,6 +74,7 @@ class _MineSelectionPageState extends State<MineSelectionPage> {
     // 'Underground Substation',
     // 'Explosive Magazine',
         'Kusunda',
+        'Kankanee'
         // 'East Basuriya',
         // 'Sijua',
         // 'Tetulmari',

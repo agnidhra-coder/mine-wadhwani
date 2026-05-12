@@ -70,11 +70,11 @@ class _HomePageState extends State<HomePage> {
           'Verify and authorize completed hazard remediations and safety sign-offs.',
     ),
     _DashboardCard(
-      icon: Icons.sync_rounded,
+      icon: Icons.query_stats_rounded,
       iconBgColor: Color(0xFFF0F0F0),
       iconColor: Color(0xFF888888),
       accentColor: Color(0xFF888888),
-      title: 'Sync Data',
+      title: 'Risk Analytics',
       description:
           'Push local reports to central archive and pull the latest shift safety protocols.',
     ),
