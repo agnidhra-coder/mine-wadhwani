@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
@@ -745,28 +746,54 @@ class _StockpileReportPreviewPageState
     setState(() => _isGenerating = true);
     try {
       final bytes = await _generatePdf();
-      final dir = await getApplicationDocumentsDirectory();
       final fileName =
           'stockpile_inspection_${DateTime.now().millisecondsSinceEpoch}.pdf';
-      final file = File('${dir.path}/$fileName');
-      await file.writeAsBytes(bytes);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle_outline,
-                    color: Colors.white, size: 18),
-                const SizedBox(width: 8),
-                Text('Saved: $fileName'),
-              ],
-            ),
-            backgroundColor: const Color(0xFF10B981),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10)),
-          ),
+
+      if (kIsWeb) {
+        await Printing.sharePdf(
+          bytes: bytes,
+          filename: fileName,
         );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle_outline,
+                      color: Colors.white, size: 18),
+                  const SizedBox(width: 8),
+                  Text('Saved: $fileName'),
+                ],
+              ),
+              backgroundColor: const Color(0xFF10B981),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+          );
+        }
+      } else {
+        final dir = await getApplicationDocumentsDirectory();
+        final file = File('${dir.path}/$fileName');
+        await file.writeAsBytes(bytes);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle_outline,
+                      color: Colors.white, size: 18),
+                  const SizedBox(width: 8),
+                  Text('Saved: $fileName'),
+                ],
+              ),
+              backgroundColor: const Color(0xFF10B981),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -1624,12 +1651,19 @@ class _StockpileReportPreviewPageState
                                       itemBuilder: (_, idx) => ClipRRect(
                                         borderRadius:
                                             BorderRadius.circular(6),
-                                        child: Image.file(
-                                          File(mediaList[idx]),
-                                          width: 50,
-                                          height: 50,
-                                          fit: BoxFit.cover,
-                                        ),
+                                        child: kIsWeb
+                                            ? Image.network(
+                                                mediaList[idx],
+                                                width: 50,
+                                                height: 50,
+                                                fit: BoxFit.cover,
+                                              )
+                                            : Image.file(
+                                                File(mediaList[idx]),
+                                                width: 50,
+                                                height: 50,
+                                                fit: BoxFit.cover,
+                                              ),
                                       ),
                                     ),
                                   ),

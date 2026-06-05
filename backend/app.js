@@ -22,7 +22,9 @@ app.use(
   }),
 );
 app.get("/health", (req, res) => {
-  res.status(200).json({ status: "OK", message: "Server is healthy and active" });
+  res
+    .status(200)
+    .json({ status: "OK", message: "Server is healthy and active" });
 });
 
 import userrouter from "./src/Routes/User/user.route.js";

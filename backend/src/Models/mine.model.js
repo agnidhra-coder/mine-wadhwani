@@ -19,11 +19,11 @@ const MineSchema = new mongoose.Schema(
     location: {
       type: String,
       required: false,
-    }
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 export const MineModel = mongoose.model("Mine", MineSchema);

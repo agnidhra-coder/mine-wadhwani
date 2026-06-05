@@ -14,10 +14,10 @@ class ChecklistModel extends ChecklistEntity {
 
   factory ChecklistModel.fromJson(Map<String, dynamic> json) {
     return ChecklistModel(
-      questionCode: json['question_code'] as String? ?? '',
-      mainTopic: json['main_topic'] as String? ?? '',
-      subTopic: json['sub_topic'] as String? ?? '',
-      questionText: json['question_text'] as String? ?? '',
+      questionCode: (json['question_code'] ?? json['questionCode']) as String? ?? '',
+      mainTopic: (json['main_topic'] ?? json['maintopic']) as String? ?? '',
+      subTopic: (json['sub_topic'] ?? json['subtopic']) as String? ?? '',
+      questionText: (json['question_text'] ?? json['questionText']) as String? ?? '',
       answer: json['answer'] as String? ?? '',
       comment: json['comment'] as String? ?? '',
       imageUrls: (json['imageUrl'] as List<dynamic>?)

@@ -698,7 +698,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mine_wadhwani/core/di/injection_container.dart';
 import 'package:mine_wadhwani/core/theme/app_colors.dart';
 import 'package:mine_wadhwani/core/theme/app_text_styles.dart';
 import 'package:mine_wadhwani/data/models/draft/inspection_draft_model.dart';
@@ -726,6 +725,7 @@ class StockpileOverviewPage extends StatefulWidget {
   /// Used to overwrite the same draft (not create a new one) on re-save,
   /// and to delete it from storage after a successful final submission.
   final String? draftId;
+  final InspectionDraft? draft;
 
   const StockpileOverviewPage({
     super.key,
@@ -736,6 +736,7 @@ class StockpileOverviewPage extends StatefulWidget {
     required this.inspectionType,
     required this.company,
     this.draftId,
+    this.draft,
   });
 
   @override
@@ -762,6 +763,21 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
     // Re-use the incoming draft id or mint a fresh one.
     _draftId = widget.draftId ??
         '${widget.mineName}_${widget.area}_${widget.shift}_${DateTime.now().millisecondsSinceEpoch}';
+
+    if (widget.draft != null) {
+      for (final ans in widget.draft!.answers) {
+        final code = ans['code'] as String? ?? '';
+        if (code.isNotEmpty) {
+          _answers[code] = ans['answer'] as String? ?? '';
+          _comments[code] = ans['comment'] as String? ?? '';
+          _actions[code] = ans['action'] as String? ?? '';
+          final media = ans['media'] as String? ?? '';
+          if (media.isNotEmpty) {
+            _mediaFiles[code] = media.split('||');
+          }
+        }
+      }
+    }
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
