@@ -28,6 +28,7 @@ const get_form_data = (req, res) => {
 const save_data = async (req, res) => {
   try {
     const {
+      inspectionId,
       mine_name,
       mine_type,
       area,
@@ -80,28 +81,56 @@ const save_data = async (req, res) => {
           .json(ApiResponse.error("checklistData must be an array", 400));
       }
     }
-    
+
     // Convert dates if provided, else use current time
     const formDate = date ? new Date(date) : new Date();
     const formStartTime = startTime ? new Date(startTime) : new Date();
     const formEndTime = endTime ? new Date(endTime) : new Date();
 
-    const Question = await QuestionModel.create({
-      mine_name,
-      mine_type,
-      area,
-      shift,
-      date: formDate,
-      Inspection_type,
-      Inspector_id,
-      checklistData,
-      startTime: formStartTime,
-      endTime: formEndTime,
-      completed: completed === true,
-      observations: observations || '',
-      signature: signature || '',
-    });
-    
+    let Question;
+    if (inspectionId) {
+      Question = await QuestionModel.findById(inspectionId);
+    }
+
+    if (!Question) {
+      Question = await QuestionModel.findOne({
+        mine_name,
+        shift: Number(shift),
+        Inspection_type,
+        Inspector_id,
+        completed: false,
+      });
+    }
+
+    if (Question) {
+      Question.mine_type = mine_type;
+      Question.area = area;
+      Question.date = formDate;
+      if (checklistData) Question.checklistData = checklistData;
+      Question.startTime = formStartTime;
+      Question.endTime = formEndTime;
+      Question.completed = completed === true;
+      Question.observations = observations || "";
+      Question.signature = signature || "";
+      await Question.save();
+    } else {
+      Question = await QuestionModel.create({
+        mine_name,
+        mine_type,
+        area,
+        shift: Number(shift),
+        date: formDate,
+        Inspection_type,
+        Inspector_id,
+        checklistData,
+        startTime: formStartTime,
+        endTime: formEndTime,
+        completed: completed === true,
+        observations: observations || "",
+        signature: signature || "",
+      });
+    }
+
     console.log(Question);
     return res
       .status(201)
@@ -118,37 +147,45 @@ const save_data = async (req, res) => {
 
 const get_saved_data = async (req, res) => {
   try {
-    const { mine_name, shift, Inspection_type, date, Inspector_id } = req.query;
-    
+    const { mine_name, shift, Inspection_type, date, Inspector_id, completed } =
+      req.query;
+
     const query = {};
     if (mine_name) query.mine_name = mine_name;
     if (shift) query.shift = Number(shift);
     if (Inspection_type) query.Inspection_type = Inspection_type;
     if (Inspector_id) query.Inspector_id = Inspector_id;
+    if (completed !== undefined) {
+      query.completed = completed === "true" || completed === true;
+    }
     if (date) {
       // Ensure date comparison covers the whole day if required, or strict equality
       const queryDate = new Date(date);
-      queryDate.setHours(0,0,0,0);
+      queryDate.setHours(0, 0, 0, 0);
       const nextDate = new Date(queryDate);
       nextDate.setDate(nextDate.getDate() + 1);
       query.date = { $gte: queryDate, $lt: nextDate };
     }
 
     const forms = await QuestionModel.find(query);
-    
+
     return res
       .status(200)
-      .json(ApiResponse.success(forms, "Saved forms fetched successfully", 200));
+      .json(
+        ApiResponse.success(forms, "Saved forms fetched successfully", 200),
+      );
   } catch (error) {
     console.error("Error fetching saved forms:", error);
     return res
       .status(500)
       .json(
-        ApiResponse.error(`Error in fetching saved forms: ${error.message}`, 500),
+        ApiResponse.error(
+          `Error in fetching saved forms: ${error.message}`,
+          500,
+        ),
       );
   }
 };
-
 
 const upload_media = async (req, res) => {
   try {
@@ -165,7 +202,9 @@ const upload_media = async (req, res) => {
     if (isNaN(qIdx) || qIdx < 0) {
       return res
         .status(400)
-        .json(ApiResponse.error("questionIndex must be a non-negative number", 400));
+        .json(
+          ApiResponse.error("questionIndex must be a non-negative number", 400),
+        );
     }
 
     // --- files check ---
@@ -230,13 +269,46 @@ const upload_media = async (req, res) => {
     console.error("Error uploading media:", error);
     return res
       .status(500)
-      .json(
-        ApiResponse.error(
-          `Error uploading media: ${error.message}`,
-          500,
-        ),
-      );
+      .json(ApiResponse.error(`Error uploading media: ${error.message}`, 500));
   }
 };
 
-export { get_form_data, save_data, get_saved_data, upload_media };
+const delete_draft = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json(ApiResponse.error("id is required", 400));
+    }
+
+    const draft = await QuestionModel.findById(id);
+    if (!draft) {
+      return res.status(404).json(ApiResponse.error("Draft not found", 404));
+    }
+
+    // Safety check: Only delete if completed is false (meaning it is a draft)
+    if (draft.completed) {
+      return res
+        .status(200)
+        .json(
+          ApiResponse.success(
+            null,
+            "Completed inspection preserved (not deleted)",
+            200,
+          ),
+        );
+    }
+
+    await QuestionModel.findByIdAndDelete(id);
+    return res
+      .status(200)
+      .json(ApiResponse.success(null, "Draft deleted successfully", 200));
+  } catch (error) {
+    console.error("Error deleting draft:", error);
+    return res
+      .status(500)
+      .json(ApiResponse.error(`Error deleting draft: ${error.message}`, 500));
+  }
+};
+
+export { get_form_data, save_data, get_saved_data, upload_media, delete_draft };

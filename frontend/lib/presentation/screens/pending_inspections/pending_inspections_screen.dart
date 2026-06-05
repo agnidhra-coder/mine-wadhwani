@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mine_wadhwani/core/di/injection_container.dart';
 import 'package:mine_wadhwani/data/models/draft/inspection_draft_model.dart';
 import 'package:mine_wadhwani/presentation/bloc/draft_bloc/draft_bloc.dart';
 import 'package:mine_wadhwani/presentation/bloc/draft_bloc/draft_event.dart';
@@ -145,6 +144,7 @@ class PendingInspectionsScreen extends StatelessWidget {
             inspectionType: draft.inspectionType,
             company: '',
             draftId: draft.id,
+            draft: draft,
           ),
         ),
       ),

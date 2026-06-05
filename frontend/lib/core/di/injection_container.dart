@@ -133,10 +133,12 @@ Future<void> init() async {
   sl.registerLazySingleton<ChecklistRepository>(
     () => ChecklistRepositoryImpl(remoteDataSource: sl()),
   );
-  // DraftRepository uses SharedPreferences which is already registered above.
-  sl.registerLazySingleton<DraftRepository>(             // ← new
-    () => DraftRepositoryImpl(sharedPreferences: sl()),  // ← new
-  );                                                     // ← new
+  sl.registerLazySingleton<DraftRepository>(
+    () => DraftRepositoryImpl(
+      sharedPreferences: sl(),
+      apiClient: sl(),
+    ),
+  );
 
   // ── Use Cases ──────────────────────────────────────────
   // Auth

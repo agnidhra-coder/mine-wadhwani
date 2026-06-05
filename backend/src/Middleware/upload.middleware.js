@@ -1,6 +1,6 @@
 import multer from "multer";
 
-// Use memory storage so files stay in RAM as Buffers — 
+// Use memory storage so files stay in RAM as Buffers —
 // they get streamed straight to Cloudinary, no temp files on disk.
 const storage = multer.memoryStorage();
 
