@@ -176,7 +176,7 @@ class MineInfoPage extends StatelessWidget {
                         valueColor: navyBlue),
                     _infoRow('Safety Officer', 'Name · +91 94301 XXXXX',
                         valueColor: navyBlue),
-                    _infoRow('Coal Station', 'not avalaible',
+                    _infoRow('Public Control Room', 'not avalaible',
                         valueColor: navyBlue),
                     _infoRow('Medical Centre', 'not avalaible',
                         valueColor: navyBlue),
