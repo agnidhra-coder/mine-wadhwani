@@ -53,7 +53,7 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage>
     'Explosive magazine inspection',
     'Dust/noise inspection',
     'Contractor work inspection',
-    'PPE compliance inspection',
+    'Haul Road inspection',
     'Stockpile inspection',
   ];
 
