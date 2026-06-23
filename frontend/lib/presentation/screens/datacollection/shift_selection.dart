@@ -182,7 +182,7 @@ void _onLockedTap() {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: navyBlue,
+                  color: Color(0xFF1F579C),
                   letterSpacing: 0.5,
                 ),
               ),

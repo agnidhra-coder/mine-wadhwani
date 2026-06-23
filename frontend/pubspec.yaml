@@ -56,6 +56,7 @@ flutter:
   assets:
     - assets/images/app_trans_icon.png
     - assets/images/app_icon.png
+    - assets/images/stockpile_header.png
 
   fonts:
     - family: SFProDisplay
