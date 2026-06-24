@@ -1,3 +1,672 @@
+// import 'package:auto_route/auto_route.dart';
+// import 'package:flutter/material.dart';
+// import 'package:mine_wadhwani/core/routing/app_router.gr.dart';
+// import 'mine_info_page.dart';
+
+// @RoutePage()
+// class ShiftSelectionPage extends StatefulWidget {
+//   final String mineName;
+//   final String mineType;
+//   final String area;
+//   final String company;
+
+//   const ShiftSelectionPage({
+//     super.key,
+//     required this.mineName,
+//     required this.mineType,
+//     required this.area,
+//     required this.company,
+//   });
+
+//   @override
+//   State<ShiftSelectionPage> createState() => _ShiftSelectionPageState();
+// }
+
+// class _ShiftSelectionPageState extends State<ShiftSelectionPage>
+//     with SingleTickerProviderStateMixin {
+//   static const Color navyBlue = Color(0xFF1F579C);
+//   static const Color lightBg = Color(0xFFF5F7FA);
+//   static const Color greenAccent = Color(0xFF3DAA6E);
+
+//   String? _selectedShift;
+//   String? _selectedInspectionType;
+//   bool _mineInfoReviewed = false;
+
+//   // Animation controller for unlock reveal
+//   late AnimationController _unlockController;
+//   late Animation<double> _unlockAnimation;
+
+//   final List<Map<String, dynamic>> _shifts = [
+//     {'label': 'Shift 1', 'value': '1', 'time': '6:00 AM – 2:00 PM'},
+//     {'label': 'Shift 2', 'value': '2', 'time': '2:00 PM – 10:00 PM'},
+//     {'label': 'Shift 3', 'value': '3', 'time': '10:00 PM – 6:00 AM'},
+//   ];
+
+//   final List<String> _inspectionTypes = [
+//     'Daily statutory inspection',
+//     'Safety inspection',
+//     'Ventilation inspection',
+//     'Machinery inspection',
+//     'Electrical inspection',
+//     'Roadway inspection',
+//     'Roof & support inspection',
+//     'Explosive magazine inspection',
+//     'Dust/noise inspection',
+//     'Contractor work inspection',
+//     'Haul Road inspection',
+//     'Stockpile inspection',
+//   ];
+
+//   bool get _canProceed =>
+//       _mineInfoReviewed &&
+//       _selectedShift != null &&
+//       _selectedInspectionType != null;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _unlockController = AnimationController(
+//       vsync: this,
+//       duration: const Duration(milliseconds: 500),
+//     );
+//     _unlockAnimation = CurvedAnimation(
+//       parent: _unlockController,
+//       curve: Curves.easeOutCubic,
+//     );
+//   }
+
+//   @override
+//   void dispose() {
+//     _unlockController.dispose();
+//     super.dispose();
+//   }
+
+//   void _openMineInfo() async {
+//     final reviewed = await Navigator.of(context).push<bool>(
+//       MaterialPageRoute(
+//         builder: (_) => MineInfoPage(
+//           mineName: widget.area,
+//           mineType: widget.mineType,
+//           company: widget.company,
+//           subsidiary: widget.mineName,
+//         ),
+//       ),
+//     );
+//     if (reviewed == true && !_mineInfoReviewed) {
+//       setState(() => _mineInfoReviewed = true);
+//       _unlockController.forward(); // trigger unlock animation
+//     }
+//   }
+
+//   /// Called when user taps a locked element — nudges them to review mine info first
+// void _onLockedTap() {
+//   ScaffoldMessenger.of(context).clearSnackBars();
+//   ScaffoldMessenger.of(context).showSnackBar(
+//     SnackBar(
+//       content: const Row(
+//         children: [
+//           Icon(Icons.lock_rounded, color: Colors.white, size: 16),
+//           SizedBox(width: 10),
+//           Expanded(
+//             child: Text(
+//               'Tap "View mine info" above to unlock.',
+//               style: TextStyle(fontSize: 13),
+//             ),
+//           ),
+//         ],
+//       ),
+//       backgroundColor: const Color(0xFF1A1A2E),
+//       behavior: SnackBarBehavior.floating,
+//       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+//       margin: const EdgeInsets.all(16),
+//       duration: const Duration(seconds: 3),
+//     ),
+//   );
+// }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: lightBg,
+//       appBar: _buildAppBar(),
+//       body: Column(
+//         children: [
+//           _buildProgressBar(step: 2, total: 2),
+//           Expanded(
+//             child: SingleChildScrollView(
+//               padding: const EdgeInsets.all(20),
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   _buildSummaryCard(),
+//                   const SizedBox(height: 24),
+//                   _buildShiftAndInspectionSection(),
+//                   const SizedBox(height: 32),
+//                   _buildNextButton(),
+//                 ],
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   /// The shift + inspection section — locked behind mine info review
+//   Widget _buildShiftAndInspectionSection() {
+//     return AnimatedBuilder(
+//       animation: _unlockAnimation,
+//       builder: (context, child) {
+//         return Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             _buildSectionHeader(
+//               icon: Icons.access_time_rounded,
+//               title: 'Shift & Inspection',
+//               subtitle: 'Select shift and type of inspection',
+//             ),
+//             const SizedBox(height: 16),
+
+//             // ── Lock banner (shown when not reviewed) ──────────────
+//             if (!_mineInfoReviewed) _buildLockBanner(),
+
+//             const SizedBox(height: 8),
+
+//             // ── SHIFT LABEL ────────────────────────────────────────
+//             Opacity(
+//               opacity: _mineInfoReviewed
+//                   ? 1.0
+//                   : 0.38, // Material disabled opacity
+//               child: const Text(
+//                 'SHIFT',
+//                 style: TextStyle(
+//                   fontSize: 11,
+//                   fontWeight: FontWeight.w600,
+//                   color: Color(0xFF1F579C),
+//                   letterSpacing: 0.5,
+//                 ),
+//               ),
+//             ),
+//             const SizedBox(height: 10),
+
+//             // ── SHIFT TILES ────────────────────────────────────────
+//             _buildShiftRow(),
+
+//             const SizedBox(height: 20),
+
+//             // ── INSPECTION DROPDOWN ────────────────────────────────
+//             _buildLockedDropdownCard(
+//               label: 'Inspection Type',
+//               hint: 'Select inspection type',
+//               icon: Icons.assignment_rounded,
+//               value: _selectedInspectionType,
+//               items: _inspectionTypes,
+//               onChanged: (val) =>
+//                   setState(() => _selectedInspectionType = val),
+//             ),
+//           ],
+//         );
+//       },
+//     );
+//   }
+
+//   /// Shown above the locked section to explain why it's disabled
+// /// Clean banner — no duplicate button
+// Widget _buildLockBanner() {
+//   return Container(
+//     width: double.infinity,
+//     margin: const EdgeInsets.only(bottom: 12),
+//     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+//     decoration: BoxDecoration(
+//       color: const Color(0xFFFFF8E1),
+//       borderRadius: BorderRadius.circular(10),
+//       border: Border.all(color: const Color(0xFFFFCC02), width: 1),
+//     ),
+//     child: Row(
+//       children: const [
+//         Icon(Icons.lock_outline_rounded,
+//             size: 18, color: Color(0xFFF59E0B)),
+//         SizedBox(width: 10),
+//         Expanded(
+//           child: Text(
+//             'Review mine information above to unlock shift & inspection selection.',
+//             style: TextStyle(
+//               fontSize: 12,
+//               color: Color(0xFF92400E),
+//               fontWeight: FontWeight.w500,
+//             ),
+//           ),
+//         ),
+//       ],
+//     ),
+//   );
+// }
+
+//   /// Shift row — tapping while locked shows a snackbar nudge
+//   Widget _buildShiftRow() {
+//     return GestureDetector(
+//       onTap: _mineInfoReviewed ? null : _onLockedTap,
+//       child: AbsorbPointer(
+//         absorbing: !_mineInfoReviewed,
+//         child: Opacity(
+//           opacity: _mineInfoReviewed ? 1.0 : 0.38,
+//           child: Row(
+//             children: _shifts.map((shift) {
+//               final isSelected = _selectedShift == shift['value'];
+//               return Expanded(
+//                 child: GestureDetector(
+//                   onTap: () =>
+//                       setState(() => _selectedShift = shift['value']),
+//                   child: Container(
+//                     margin: EdgeInsets.only(
+//                       right: shift['value'] != '3' ? 10 : 0,
+//                     ),
+//                     padding: const EdgeInsets.symmetric(
+//                         vertical: 14, horizontal: 8),
+//                     decoration: BoxDecoration(
+//                       color: isSelected ? navyBlue : Colors.white,
+//                       borderRadius: BorderRadius.circular(12),
+//                       border: Border.all(
+//                         color: isSelected
+//                             ? navyBlue
+//                             : Colors.grey.shade200,
+//                         width: isSelected ? 2 : 1,
+//                       ),
+//                       boxShadow: isSelected
+//                           ? [
+//                               BoxShadow(
+//                                 color: navyBlue.withValues(alpha: 0.2),
+//                                 blurRadius: 8,
+//                                 offset: const Offset(0, 3),
+//                               )
+//                             ]
+//                           : [],
+//                     ),
+//                     child: Column(
+//                       children: [
+//                         Icon(
+//                           Icons.wb_sunny_rounded,
+//                           color: isSelected
+//                               ? Colors.white
+//                               : Colors.grey[400],
+//                           size: 20,
+//                         ),
+//                         const SizedBox(height: 6),
+//                         Text(
+//                           shift['label'],
+//                           style: TextStyle(
+//                             fontSize: 13,
+//                             fontWeight: FontWeight.bold,
+//                             color: isSelected
+//                                 ? Colors.white
+//                                 : const Color(0xFF1A1A2E),
+//                           ),
+//                         ),
+//                         const SizedBox(height: 4),
+//                         Text(
+//                           shift['time'],
+//                           textAlign: TextAlign.center,
+//                           style: TextStyle(
+//                             fontSize: 9,
+//                             color: isSelected
+//                                 ? Colors.white60
+//                                 : Colors.grey[500],
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 ),
+//               );
+//             }).toList(),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   /// Dropdown that absorbs taps and shows a snackbar when locked
+//   Widget _buildLockedDropdownCard({
+//     required String label,
+//     required String hint,
+//     required IconData icon,
+//     required String? value,
+//     required List<String> items,
+//     required void Function(String?) onChanged,
+//   }) {
+//     return GestureDetector(
+//       onTap: _mineInfoReviewed ? null : _onLockedTap,
+//       child: AbsorbPointer(
+//         absorbing: !_mineInfoReviewed,
+//         child: Opacity(
+//           opacity: _mineInfoReviewed ? 1.0 : 0.38,
+//           child: _buildDropdownCard(
+//             label: label,
+//             hint: hint,
+//             icon: icon,
+//             value: value,
+//             items: items,
+//             onChanged: onChanged,
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   Widget _buildNextButton() {
+//     return SizedBox(
+//       width: double.infinity,
+//       height: 52,
+//       child: ElevatedButton(
+//         onPressed: _canProceed
+//             ? () {
+//                 if (_selectedInspectionType == 'Stockpile inspection') {
+//                   context.router.push(StockpileOverviewRoute(
+//                     mineName: widget.mineName,
+//                     mineType: widget.mineType,
+//                     area: widget.area,
+//                     shift: int.parse(_selectedShift!),
+//                     inspectionType: _selectedInspectionType!,
+//                     company: widget.company,
+//                   ));
+//                 } else {
+//                   context.router.push(ChecklistOverviewRoute(
+//                     mineName: widget.mineName,
+//                     mineType: widget.mineType,
+//                     area: widget.area,
+//                     shift: int.parse(_selectedShift!),
+//                     inspectionType: _selectedInspectionType!,
+//                   ));
+//                 }
+//               }
+//             : null,
+//         style: ElevatedButton.styleFrom(
+//           backgroundColor: navyBlue,
+//           disabledBackgroundColor: Colors.grey.shade300,
+//           foregroundColor: Colors.white,
+//           shape: RoundedRectangleBorder(
+//             borderRadius: BorderRadius.circular(10),
+//           ),
+//           elevation: 0,
+//         ),
+//         child: const Row(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             Text(
+//               'Next',
+//               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+//             ),
+//             SizedBox(width: 8),
+//             Icon(Icons.arrow_forward_rounded, size: 20),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+
+//   AppBar _buildAppBar() {
+//     return AppBar(
+//       backgroundColor: navyBlue,
+//       foregroundColor: Colors.white,
+//       elevation: 0,
+//       leading: IconButton(
+//         icon: const Icon(Icons.arrow_back_ios_rounded),
+//         onPressed: () => context.router.maybePop(),
+//       ),
+//       title: const Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Text(
+//             'Start Inspection',
+//             style: TextStyle(
+//               fontSize: 16,
+//               fontWeight: FontWeight.bold,
+//               color: Colors.white,
+//             ),
+//           ),
+//           Text(
+//             'Step 2 of 2',
+//             style: TextStyle(fontSize: 11, color: Colors.white60),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   Widget _buildProgressBar({required int step, required int total}) {
+//     return Container(
+//       color: navyBlue,
+//       padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+//       child: Row(
+//         children: List.generate(total, (index) {
+//           final isActive = index < step;
+//           return Expanded(
+//             child: Container(
+//               margin: EdgeInsets.only(right: index < total - 1 ? 8 : 0),
+//               height: 4,
+//               decoration: BoxDecoration(
+//                 color: isActive ? greenAccent : Colors.white24,
+//                 borderRadius: BorderRadius.circular(2),
+//               ),
+//             ),
+//           );
+//         }),
+//       ),
+//     );
+//   }
+
+//   Widget _buildSummaryCard() {
+//     return Container(
+//       width: double.infinity,
+//       padding: const EdgeInsets.all(16),
+//       decoration: BoxDecoration(
+//         color: navyBlue.withValues(alpha: 0.05),
+//         borderRadius: BorderRadius.circular(12),
+//         border: Border.all(color: navyBlue.withValues(alpha: 0.12)),
+//       ),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           const Text(
+//             'SELECTED DETAILS',
+//             style: TextStyle(
+//               fontSize: 10,
+//               fontWeight: FontWeight.w700,
+//               color: navyBlue,
+//               letterSpacing: 0.8,
+//             ),
+//           ),
+//           const SizedBox(height: 10),
+//           _summaryRow(Icons.apartment_rounded, 'Company', widget.company),
+//           const SizedBox(height: 6),
+//           _summaryRow(
+//               Icons.business_rounded, 'Subsidiaries', widget.mineName),
+//           const SizedBox(height: 6),
+//           _summaryRow(Icons.category_rounded, 'Type', widget.mineType),
+//           const SizedBox(height: 6),
+//           _summaryRow(Icons.map_rounded, 'Mine', widget.area),
+//           const SizedBox(height: 12),
+//           const Divider(height: 1, thickness: 0.5),
+//           const SizedBox(height: 10),
+//           GestureDetector(
+//             onTap: _openMineInfo,
+//             child: Row(
+//               children: [
+//                 Icon(
+//                   Icons.info_outline_rounded,
+//                   size: 15,
+//                   color: _mineInfoReviewed ? greenAccent : navyBlue,
+//                 ),
+//                 const SizedBox(width: 6),
+//                 Text(
+//                   _mineInfoReviewed
+//                       ? 'Mine info reviewed ✓'
+//                       : 'View mine info',
+//                   style: TextStyle(
+//                     fontSize: 12,
+//                     fontWeight: FontWeight.w600,
+//                     color: _mineInfoReviewed ? greenAccent : navyBlue,
+//                     decoration: _mineInfoReviewed
+//                         ? TextDecoration.none
+//                         : TextDecoration.underline,
+//                   ),
+//                 ),
+//                 const Spacer(),
+//                 if (_mineInfoReviewed)
+//                   const Icon(Icons.check_circle_rounded,
+//                       size: 16, color: greenAccent)
+//                 else
+//                   const Icon(Icons.chevron_right_rounded,
+//                       size: 18, color: navyBlue),
+//               ],
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   Widget _summaryRow(IconData icon, String label, String value) {
+//     return Row(
+//       children: [
+//         Icon(icon, size: 14, color: navyBlue),
+//         const SizedBox(width: 8),
+//         Text('$label: ',
+//             style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+//         Expanded(
+//           child: Text(
+//             value,
+//             style: const TextStyle(
+//               fontSize: 12,
+//               fontWeight: FontWeight.w600,
+//               color: Color(0xFF1A1A2E),
+//             ),
+//             overflow: TextOverflow.ellipsis,
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+
+//   Widget _buildSectionHeader({
+//     required IconData icon,
+//     required String title,
+//     required String subtitle,
+//   }) {
+//     return Row(
+//       children: [
+//         Container(
+//           width: 44,
+//           height: 44,
+//           decoration: BoxDecoration(
+//             color: const Color(0xFFE4EBF2),
+//             borderRadius: BorderRadius.circular(10),
+//           ),
+//           child: Icon(icon, color: navyBlue, size: 22),
+//         ),
+//         const SizedBox(width: 12),
+//         Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Text(title,
+//                 style: const TextStyle(
+//                   fontSize: 18,
+//                   fontWeight: FontWeight.bold,
+//                   color: Color(0xFF1A1A2E),
+//                 )),
+//             Text(subtitle,
+//                 style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+//           ],
+//         ),
+//       ],
+//     );
+//   }
+
+//   Widget _buildDropdownCard({
+//     required String label,
+//     required String hint,
+//     required IconData icon,
+//     required String? value,
+//     required List<String> items,
+//     required void Function(String?) onChanged,
+//   }) {
+//     return Container(
+//       decoration: BoxDecoration(
+//         color: Colors.white,
+//         borderRadius: BorderRadius.circular(12),
+//         border: Border.all(
+//           color: value != null
+//               ? navyBlue.withValues(alpha: 0.3)
+//               : Colors.grey.shade200,
+//         ),
+//         boxShadow: [
+//           BoxShadow(
+//             color: Colors.grey.withValues(alpha: 0.06),
+//             blurRadius: 8,
+//             offset: const Offset(0, 2),
+//           ),
+//         ],
+//       ),
+//       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Row(
+//             children: [
+//               Icon(icon, size: 14, color: navyBlue),
+//               const SizedBox(width: 6),
+//               Text(
+//                 label,
+//                 style: const TextStyle(
+//                   fontSize: 11,
+//                   fontWeight: FontWeight.w600,
+//                   color: navyBlue,
+//                   letterSpacing: 0.5,
+//                 ),
+//               ),
+//               if (value != null) ...[
+//                 const Spacer(),
+//                 Container(
+//                   width: 6,
+//                   height: 6,
+//                   decoration: const BoxDecoration(
+//                     color: Color(0xFF3DAA6E),
+//                     shape: BoxShape.circle,
+//                   ),
+//                 ),
+//               ],
+//             ],
+//           ),
+//           DropdownButtonHideUnderline(
+//             child: DropdownButton<String>(
+//               value: value,
+//               hint: Text(hint,
+//                   style:
+//                       TextStyle(color: Colors.grey[400], fontSize: 14)),
+//               isExpanded: true,
+//               icon: const Icon(Icons.keyboard_arrow_down_rounded,
+//                   color: navyBlue),
+//               dropdownColor: const Color(0xFFFAFAFA),
+//               style: const TextStyle(
+//                 fontSize: 14,
+//                 color: Color(0xFF1A1A2E),
+//                 fontWeight: FontWeight.w500,
+//               ),
+//               items: items
+//                   .map((item) => DropdownMenuItem(
+//                         value: item,
+//                         child: Text(item),
+//                       ))
+//                   .toList(),
+//               onChanged: onChanged,
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:mine_wadhwani/core/routing/app_router.gr.dart';
@@ -32,7 +701,6 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage>
   String? _selectedInspectionType;
   bool _mineInfoReviewed = false;
 
-  // Animation controller for unlock reveal
   late AnimationController _unlockController;
   late Animation<double> _unlockAnimation;
 
@@ -94,35 +762,75 @@ class _ShiftSelectionPageState extends State<ShiftSelectionPage>
     );
     if (reviewed == true && !_mineInfoReviewed) {
       setState(() => _mineInfoReviewed = true);
-      _unlockController.forward(); // trigger unlock animation
+      _unlockController.forward();
     }
   }
 
-  /// Called when user taps a locked element — nudges them to review mine info first
-void _onLockedTap() {
-  ScaffoldMessenger.of(context).clearSnackBars();
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: const Row(
-        children: [
-          Icon(Icons.lock_rounded, color: Colors.white, size: 16),
-          SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              'Tap "View mine info" above to unlock.',
-              style: TextStyle(fontSize: 13),
+  void _onLockedTap() {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Row(
+          children: [
+            Icon(Icons.lock_rounded, color: Colors.white, size: 16),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Tap "View mine info" above to unlock.',
+                style: TextStyle(fontSize: 13),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
+        backgroundColor: const Color(0xFF1A1A2E),
+        behavior: SnackBarBehavior.floating,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
       ),
-      backgroundColor: const Color(0xFF1A1A2E),
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      margin: const EdgeInsets.all(16),
-      duration: const Duration(seconds: 3),
-    ),
-  );
-}
+    );
+  }
+
+  // ─── Navigation ───────────────────────────────────────────────────────────
+  //
+  // Single place that decides which overview page to open based on the
+  // selected inspection type. Add new inspection types here as the app grows.
+
+  void _onNext() {
+    final shift = int.parse(_selectedShift!);
+    final type = _selectedInspectionType!;
+
+    if (type == 'Stockpile inspection') {
+      context.router.push(StockpileOverviewRoute(
+        mineName: widget.mineName,
+        mineType: widget.mineType,
+        area: widget.area,
+        shift: shift,
+        inspectionType: type,
+        company: widget.company,
+      ));
+    } else if (type == 'Haul Road inspection') {
+      // ── NEW: routes to HaulRoadOverviewPage ──────────────────────────
+      context.router.push(HaulRoadOverviewRoute(
+        mineName: widget.mineName,
+        mineType: widget.mineType,
+        area: widget.area,
+        shift: shift,
+        inspectionType: type,
+        company: widget.company,
+      ));
+    } else {
+      // All other inspection types → generic checklist flow
+      context.router.push(ChecklistOverviewRoute(
+        mineName: widget.mineName,
+        mineType: widget.mineType,
+        area: widget.area,
+        shift: shift,
+        inspectionType: type,
+      ));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +860,6 @@ void _onLockedTap() {
     );
   }
 
-  /// The shift + inspection section — locked behind mine info review
   Widget _buildShiftAndInspectionSection() {
     return AnimatedBuilder(
       animation: _unlockAnimation,
@@ -166,35 +873,23 @@ void _onLockedTap() {
               subtitle: 'Select shift and type of inspection',
             ),
             const SizedBox(height: 16),
-
-            // ── Lock banner (shown when not reviewed) ──────────────
             if (!_mineInfoReviewed) _buildLockBanner(),
-
             const SizedBox(height: 8),
-
-            // ── SHIFT LABEL ────────────────────────────────────────
             Opacity(
-              opacity: _mineInfoReviewed
-                  ? 1.0
-                  : 0.38, // Material disabled opacity
+              opacity: _mineInfoReviewed ? 1.0 : 0.38,
               child: const Text(
                 'SHIFT',
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: navyBlue,
+                  color: Color(0xFF1F579C),
                   letterSpacing: 0.5,
                 ),
               ),
             ),
             const SizedBox(height: 10),
-
-            // ── SHIFT TILES ────────────────────────────────────────
             _buildShiftRow(),
-
             const SizedBox(height: 20),
-
-            // ── INSPECTION DROPDOWN ────────────────────────────────
             _buildLockedDropdownCard(
               label: 'Inspection Type',
               hint: 'Select inspection type',
@@ -210,39 +905,36 @@ void _onLockedTap() {
     );
   }
 
-  /// Shown above the locked section to explain why it's disabled
-/// Clean banner — no duplicate button
-Widget _buildLockBanner() {
-  return Container(
-    width: double.infinity,
-    margin: const EdgeInsets.only(bottom: 12),
-    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-    decoration: BoxDecoration(
-      color: const Color(0xFFFFF8E1),
-      borderRadius: BorderRadius.circular(10),
-      border: Border.all(color: const Color(0xFFFFCC02), width: 1),
-    ),
-    child: Row(
-      children: const [
-        Icon(Icons.lock_outline_rounded,
-            size: 18, color: Color(0xFFF59E0B)),
-        SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            'Review mine information above to unlock shift & inspection selection.',
-            style: TextStyle(
-              fontSize: 12,
-              color: Color(0xFF92400E),
-              fontWeight: FontWeight.w500,
+  Widget _buildLockBanner() {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF8E1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFFFCC02), width: 1),
+      ),
+      child: Row(
+        children: const [
+          Icon(Icons.lock_outline_rounded,
+              size: 18, color: Color(0xFFF59E0B)),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Review mine information above to unlock shift & inspection selection.',
+              style: TextStyle(
+                fontSize: 12,
+                color: Color(0xFF92400E),
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
-  /// Shift row — tapping while locked shows a snackbar nudge
   Widget _buildShiftRow() {
     return GestureDetector(
       onTap: _mineInfoReviewed ? null : _onLockedTap,
@@ -286,9 +978,8 @@ Widget _buildLockBanner() {
                       children: [
                         Icon(
                           Icons.wb_sunny_rounded,
-                          color: isSelected
-                              ? Colors.white
-                              : Colors.grey[400],
+                          color:
+                              isSelected ? Colors.white : Colors.grey[400],
                           size: 20,
                         ),
                         const SizedBox(height: 6),
@@ -325,7 +1016,6 @@ Widget _buildLockBanner() {
     );
   }
 
-  /// Dropdown that absorbs taps and shows a snackbar when locked
   Widget _buildLockedDropdownCard({
     required String label,
     required String hint,
@@ -358,28 +1048,8 @@ Widget _buildLockBanner() {
       width: double.infinity,
       height: 52,
       child: ElevatedButton(
-        onPressed: _canProceed
-            ? () {
-                if (_selectedInspectionType == 'Stockpile inspection') {
-                  context.router.push(StockpileOverviewRoute(
-                    mineName: widget.mineName,
-                    mineType: widget.mineType,
-                    area: widget.area,
-                    shift: int.parse(_selectedShift!),
-                    inspectionType: _selectedInspectionType!,
-                    company: widget.company,
-                  ));
-                } else {
-                  context.router.push(ChecklistOverviewRoute(
-                    mineName: widget.mineName,
-                    mineType: widget.mineType,
-                    area: widget.area,
-                    shift: int.parse(_selectedShift!),
-                    inspectionType: _selectedInspectionType!,
-                  ));
-                }
-              }
-            : null,
+        // ── All routing logic is now in _onNext() ──────────────────────
+        onPressed: _canProceed ? _onNext : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: navyBlue,
           disabledBackgroundColor: Colors.grey.shade300,
@@ -394,7 +1064,8 @@ Widget _buildLockBanner() {
           children: [
             Text(
               'Next',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style:
+                  TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             SizedBox(width: 8),
             Icon(Icons.arrow_forward_rounded, size: 20),
