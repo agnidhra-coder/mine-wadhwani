@@ -11,6 +11,7 @@ import 'package:mine_wadhwani/core/theme/app_colors.dart';
 import 'package:mine_wadhwani/core/theme/app_text_styles.dart';
 import 'package:mine_wadhwani/presentation/screens/stockpile/action_page.dart';
 import 'package:mine_wadhwani/presentation/screens/stockpile/stockpile_data.dart';
+import 'package:mine_wadhwani/data/models/health_assessment/health_assessment_model.dart';
 
 class StockpileReportPreviewPage extends StatefulWidget {
   final String company;
@@ -29,6 +30,7 @@ class StockpileReportPreviewPage extends StatefulWidget {
   final String observations;
   final Uint8List? signatureBytes;
   final DateTime reviewedAt;
+  final HealthAssessmentModel? healthAssessment;
 
   const StockpileReportPreviewPage({
     super.key,
@@ -48,6 +50,7 @@ class StockpileReportPreviewPage extends StatefulWidget {
     required this.observations,
     required this.signatureBytes,
     required this.reviewedAt,
+    this.healthAssessment,
   });
 
   @override

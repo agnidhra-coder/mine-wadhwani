@@ -1,5 +1,5 @@
 name: mine_wadhwani
-description: "A new Flutter project."
+description: "Ai-enabled mine inspection for health, safety and data analysis for risk indices."
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -57,6 +57,7 @@ flutter:
     - assets/images/app_trans_icon.png
     - assets/images/app_icon.png
     - assets/images/stockpile_header.png
+    - assets/images/worker_health_assessment.png
 
   fonts:
     - family: SFProDisplay
