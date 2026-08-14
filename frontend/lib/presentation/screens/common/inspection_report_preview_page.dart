@@ -14,6 +14,7 @@ import 'package:printing/printing.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:mine_wadhwani/core/theme/app_colors.dart';
 import 'package:mine_wadhwani/core/theme/app_text_styles.dart';
+import 'package:mine_wadhwani/data/models/health_assessment/health_assessment_model.dart';
 import 'package:mine_wadhwani/presentation/screens/common/inspection_section.dart';
 import 'package:mine_wadhwani/presentation/screens/stockpile/action_page.dart';
 
@@ -34,6 +35,7 @@ class InspectionReportPreviewPage extends StatefulWidget {
   final String observations;
   final Uint8List? signatureBytes;
   final DateTime reviewedAt;
+  final HealthAssessmentModel? healthAssessment;
 
   const InspectionReportPreviewPage({
     super.key,
@@ -53,6 +55,7 @@ class InspectionReportPreviewPage extends StatefulWidget {
     required this.observations,
     required this.signatureBytes,
     required this.reviewedAt,
+    this.healthAssessment,
   });
 
   @override
@@ -311,6 +314,12 @@ class _InspectionReportPreviewPageState
             ),
           ),
           pw.SizedBox(height: 20),
+
+          // Worker Health Assessment
+          if (widget.healthAssessment != null) ...[
+            _pdfHealthAssessmentSection(widget.healthAssessment!),
+            pw.SizedBox(height: 20),
+          ],
 
           // Flagged items
           if (_flaggedCount > 0) ...[
@@ -702,6 +711,158 @@ class _InspectionReportPreviewPageState
     );
   }
 
+  pw.Widget _pdfHealthAssessmentSection(HealthAssessmentModel ha) {
+    if (!ha.conducted) {
+      return pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text('WORKER HEALTH ASSESSMENT',
+              style: pw.TextStyle(
+                  fontSize: 11,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColor.fromHex('#1F579C'),
+                  letterSpacing: 0.5)),
+          pw.SizedBox(height: 8),
+          pw.Container(
+            padding: const pw.EdgeInsets.all(12),
+            decoration: pw.BoxDecoration(
+              border: pw.Border.all(color: PdfColor.fromHex('#E0E3EA'), width: 1),
+              borderRadius: pw.BorderRadius.circular(8),
+            ),
+            child: pw.Text('Not conducted this shift',
+                style: pw.TextStyle(fontSize: 10, color: PdfColor.fromHex('#6B7280'))),
+          ),
+        ],
+      );
+    }
+
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          children: [
+            pw.Text('WORKER HEALTH ASSESSMENT',
+                style: pw.TextStyle(
+                    fontSize: 11,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColor.fromHex('#1F579C'),
+                    letterSpacing: 0.5)),
+            if (ha.hasFlags)
+              pw.Container(
+                padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: pw.BoxDecoration(
+                  color: PdfColor.fromHex('#FEF2F2'),
+                  borderRadius: pw.BorderRadius.circular(10),
+                ),
+                child: pw.Text('${ha.flagCount} flag${ha.flagCount == 1 ? '' : 's'}',
+                    style: pw.TextStyle(
+                        fontSize: 9,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColor.fromHex('#EF4444'))),
+              ),
+          ],
+        ),
+        pw.SizedBox(height: 8),
+        pw.Container(
+          padding: const pw.EdgeInsets.all(12),
+          decoration: pw.BoxDecoration(
+            border: pw.Border.all(color: PdfColor.fromHex('#E0E3EA'), width: 1),
+            borderRadius: pw.BorderRadius.circular(8),
+          ),
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              _pdfDetailRow('Zone', ha.zone),
+              _pdfDetailRow('Modes', ha.modes.join(', ')),
+              if (ha.aqmReadings.isNotEmpty) ...[
+                pw.SizedBox(height: 8),
+                pw.Text('AQM READING',
+                    style: pw.TextStyle(
+                        fontSize: 9,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColor.fromHex('#1F579C'),
+                        letterSpacing: 0.5)),
+                pw.SizedBox(height: 4),
+                ...ha.aqmReadings.entries.map((e) => _pdfHealthRow(e.key, e.value, ha.aqmFlagged)),
+              ],
+              if (ha.droneReadings.isNotEmpty) ...[
+                pw.SizedBox(height: 8),
+                pw.Text('DRONE SWEEP',
+                    style: pw.TextStyle(
+                        fontSize: 9,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColor.fromHex('#1F579C'),
+                        letterSpacing: 0.5)),
+                pw.SizedBox(height: 4),
+                ...ha.droneReadings.entries.map((e) => _pdfHealthRow(e.key, e.value, false)),
+              ],
+              if (ha.workerReadings.isNotEmpty) ...[
+                pw.SizedBox(height: 8),
+                pw.Text('SMARTWATCH SPOT-CHECK',
+                    style: pw.TextStyle(
+                        fontSize: 9,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColor.fromHex('#1F579C'),
+                        letterSpacing: 0.5)),
+                pw.SizedBox(height: 4),
+                ...ha.workerReadings.map((w) => pw.Padding(
+                      padding: const pw.EdgeInsets.only(bottom: 6),
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text(w.name.isEmpty ? 'Worker' : w.name,
+                              style: pw.TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: pw.FontWeight.bold,
+                                  color: PdfColor.fromHex('#1A2340'))),
+                          _pdfHealthRow('Heart Rate', '${w.heartRate} bpm', w.heartRateFlagged),
+                          _pdfHealthRow('SpO2', '${w.spo2} %', w.spo2Flagged),
+                        ],
+                      ),
+                    )),
+              ],
+              if (ha.notes.isNotEmpty) ...[
+                pw.SizedBox(height: 8),
+                pw.Text('NOTES',
+                    style: pw.TextStyle(
+                        fontSize: 9,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColor.fromHex('#1F579C'),
+                        letterSpacing: 0.5)),
+                pw.SizedBox(height: 4),
+                pw.Text(ha.notes, style: pw.TextStyle(fontSize: 9, color: PdfColor.fromHex('#374151'))),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  pw.Widget _pdfHealthRow(String label, String value, bool flagged) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.only(bottom: 3),
+      child: pw.Row(
+        children: [
+          pw.SizedBox(
+            width: 110,
+            child: pw.Text('$label:', style: pw.TextStyle(fontSize: 9, color: PdfColor.fromHex('#6B7280'))),
+          ),
+          pw.Text(value,
+              style: pw.TextStyle(
+                  fontSize: 9,
+                  fontWeight: pw.FontWeight.bold,
+                  color: flagged ? PdfColor.fromHex('#EF4444') : PdfColor.fromHex('#1A2340'))),
+          if (flagged) ...[
+            pw.SizedBox(width: 4),
+            pw.Text('⚠', style: pw.TextStyle(fontSize: 9, color: PdfColor.fromHex('#EF4444'))),
+          ],
+        ],
+      ),
+    );
+  }
+
   // ─── PDF actions ──────────────────────────────────────────────────────────
 
   Future<void> _downloadPdf() async {
@@ -943,6 +1104,28 @@ class _InspectionReportPreviewPageState
                   const SizedBox(height: 10),
                   _detailsCard(),
 
+                  if (widget.healthAssessment != null && widget.healthAssessment!.conducted) ...[
+                    const SizedBox(height: 20),
+                    _sectionTitle('WORKER HEALTH ASSESSMENT'),
+                    const SizedBox(height: 10),
+                    _healthAssessmentCard(),
+                  ] else if (widget.healthAssessment != null) ...[
+                    const SizedBox(height: 20),
+                    _sectionTitle('WORKER HEALTH ASSESSMENT'),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFE0E3EA)),
+                      ),
+                      child: Text('Not conducted this shift',
+                          style: TextStyle(fontSize: 13, color: AppColors.secondary.withValues(alpha: 0.6))),
+                    ),
+                  ],
+
                   if (_flaggedCount > 0) ...[
                     const SizedBox(height: 20),
                     _flaggedItemsSection(),
@@ -1110,6 +1293,114 @@ class _InspectionReportPreviewPageState
                 ],
               ),
             )).toList(),
+      ),
+    );
+  }
+
+  Widget _healthAssessmentCard() {
+    final ha = widget.healthAssessment!;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE0E3EA)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text('Zone: ${ha.zone}',
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF1A2340))),
+              ),
+              if (ha.hasFlags)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEF2F2),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.4)),
+                  ),
+                  child: Text('${ha.flagCount} flag${ha.flagCount == 1 ? '' : 's'}',
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFFEF4444))),
+                ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text('Modes: ${ha.modes.join(', ')}',
+              style: TextStyle(fontSize: 12, color: AppColors.secondary.withValues(alpha: 0.6))),
+          if (ha.aqmReadings.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            const Text('AQM READING',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF1F579C), letterSpacing: 0.5)),
+            const SizedBox(height: 6),
+            ...ha.aqmReadings.entries.map((e) => _healthRow(e.key, e.value, ha.aqmFlagged)),
+          ],
+          if (ha.droneReadings.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            const Text('DRONE SWEEP',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF1F579C), letterSpacing: 0.5)),
+            const SizedBox(height: 6),
+            ...ha.droneReadings.entries.map((e) => _healthRow(e.key, e.value, false)),
+          ],
+          if (ha.workerReadings.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            const Text('SMARTWATCH SPOT-CHECK',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF1F579C), letterSpacing: 0.5)),
+            const SizedBox(height: 6),
+            ...ha.workerReadings.map((w) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: w.isFlagged ? const Color(0xFFFEF2F2) : const Color(0xFFF5F7FA),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(w.name.isEmpty ? 'Worker' : w.name,
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF1A2340))),
+                        const SizedBox(height: 2),
+                        _healthRow('Heart Rate', '${w.heartRate} bpm', w.heartRateFlagged, compact: true),
+                        _healthRow('SpO2', '${w.spo2} %', w.spo2Flagged, compact: true),
+                      ],
+                    ),
+                  ),
+                )),
+          ],
+          if (ha.notes.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            const Text('NOTES',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF1F579C), letterSpacing: 0.5)),
+            const SizedBox(height: 6),
+            Text(ha.notes, style: const TextStyle(fontSize: 13, color: Color(0xFF374151))),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _healthRow(String label, String value, bool flagged, {bool compact = false}) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: compact ? 2 : 6),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(label, style: TextStyle(fontSize: compact ? 11 : 13, color: const Color(0xFF6B7280))),
+          ),
+          Text(value,
+              style: TextStyle(
+                  fontSize: compact ? 11 : 13,
+                  fontWeight: FontWeight.w600,
+                  color: flagged ? const Color(0xFFEF4444) : const Color(0xFF1A2340))),
+          if (flagged) ...[
+            const SizedBox(width: 4),
+            const Icon(Icons.warning_amber_rounded, size: 14, color: Color(0xFFEF4444)),
+          ],
+        ],
       ),
     );
   }

@@ -13,6 +13,8 @@ import 'package:mine_wadhwani/presentation/bloc/draft_bloc/draft_state.dart';
 import 'package:mine_wadhwani/presentation/screens/stockpile/stockpile_checklist_page.dart';
 import 'package:mine_wadhwani/presentation/screens/stockpile/stockpile_compliance_page.dart';
 import 'package:mine_wadhwani/presentation/screens/stockpile/stockpile_data.dart';
+// newly added for health assesment
+import 'package:mine_wadhwani/data/models/health_assessment/health_assessment_model.dart';
 
 enum _OverviewMenuOption { exitInspection }
 
@@ -28,8 +30,23 @@ class StockpileOverviewPage extends StatefulWidget {
   /// Non-null when this page was opened by resuming a saved draft.
   /// Used to overwrite the same draft (not create a new one) on re-save,
   /// and to delete it from storage after a successful final submission.
+  // final String? draftId;
+  // final InspectionDraft? draft;
+
+  // const StockpileOverviewPage({
+  //   super.key,
+  //   required this.mineName,
+  //   required this.mineType,
+  //   required this.area,
+  //   required this.shift,
+  //   required this.inspectionType,
+  //   required this.company,
+  //   this.draftId,
+  //   this.draft,
+  // });
   final String? draftId;
   final InspectionDraft? draft;
+  final HealthAssessmentModel? healthAssessment;
 
   const StockpileOverviewPage({
     super.key,
@@ -41,6 +58,7 @@ class StockpileOverviewPage extends StatefulWidget {
     required this.company,
     this.draftId,
     this.draft,
+    this.healthAssessment,
   });
 
   @override
@@ -232,6 +250,7 @@ class _StockpileOverviewPageState extends State<StockpileOverviewPage> {
           actions: Map.from(_actions),
           inspectorName: user?.name ?? '',
           inspectorRole: user?.role ?? '',
+          healthAssessment: widget.healthAssessment,
         ),
       ),
     )

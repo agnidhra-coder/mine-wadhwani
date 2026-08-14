@@ -15,6 +15,7 @@ import 'package:mine_wadhwani/presentation/bloc/draft_bloc/draft_state.dart';
 import 'package:mine_wadhwani/presentation/screens/common/inspection_checklist_page.dart';
 import 'package:mine_wadhwani/presentation/screens/common/inspection_compliance_page.dart';
 import 'package:mine_wadhwani/presentation/screens/common/inspection_section.dart';
+import 'package:mine_wadhwani/data/models/health_assessment/health_assessment_model.dart';
 import 'package:mine_wadhwani/presentation/screens/haul_road/haul_road_data.dart';
 
 enum _OverviewMenuOption { exitInspection }
@@ -29,6 +30,7 @@ class HaulRoadOverviewPage extends StatefulWidget {
   final String company;
   final String? draftId;
   final InspectionDraft? draft;
+  final HealthAssessmentModel? healthAssessment;
 
   const HaulRoadOverviewPage({
     super.key,
@@ -40,6 +42,7 @@ class HaulRoadOverviewPage extends StatefulWidget {
     required this.company,
     this.draftId,
     this.draft,
+    this.healthAssessment,
   });
 
   @override
@@ -205,6 +208,7 @@ int _totalQuestions() =>
           actions: Map.from(_actions),
           inspectorName: user?.name ?? '',
           inspectorRole: user?.role ?? '',
+          healthAssessment: widget.healthAssessment,
         ),
       ),
     )

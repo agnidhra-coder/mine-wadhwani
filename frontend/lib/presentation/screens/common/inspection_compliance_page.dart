@@ -18,6 +18,7 @@ import 'package:mine_wadhwani/presentation/bloc/auth_bloc/auth_state.dart';
 import 'package:mine_wadhwani/presentation/bloc/checklist_bloc/checklist_bloc.dart';
 import 'package:mine_wadhwani/presentation/bloc/checklist_bloc/checklist_event.dart';
 import 'package:mine_wadhwani/presentation/bloc/checklist_bloc/checklist_state.dart';
+import 'package:mine_wadhwani/data/models/health_assessment/health_assessment_model.dart';
 import 'package:mine_wadhwani/presentation/screens/common/inspection_report_preview_page.dart';
 import 'package:mine_wadhwani/presentation/screens/common/inspection_section.dart';
 
@@ -79,6 +80,7 @@ class InspectionCompliancePage extends StatefulWidget {
   final Map<String, String> actions;
   final String inspectorName;
   final String inspectorRole;
+  final HealthAssessmentModel? healthAssessment;
 
   const InspectionCompliancePage({
     super.key,
@@ -95,6 +97,7 @@ class InspectionCompliancePage extends StatefulWidget {
     required this.actions,
     required this.inspectorName,
     required this.inspectorRole,
+    this.healthAssessment,
   });
 
   @override
@@ -267,6 +270,7 @@ class _InspectionCompliancePageState extends State<InspectionCompliancePage> {
           observations: _observationsController.text.trim(),
           signatureBytes: signatureBytes,
           reviewedAt: DateTime.now(),
+          healthAssessment: widget.healthAssessment,
         ),
       ),
     );
