@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:mine_wadhwani/data/models/health_assessment/health_assessment_model.dart';
 import 'package:mine_wadhwani/presentation/screens/health_assessment/risk_summary_sheet.dart';
+import 'package:mine_wadhwani/data/datasources/health_assessment/aqm_datasource.dart';
+import 'package:mine_wadhwani/data/models/aqm_reading.dart';
+import 'dart:typed_data';
+import 'package:image_picker/image_picker.dart';
+import 'package:mine_wadhwani/data/models/drone_analysis_result.dart';
+import 'package:mine_wadhwani/data/datasources/health_assessment/drone_analysis_datasource.dart';
+import 'package:mine_wadhwani/presentation/screens/health_assessment/annotated_image.dart';
+
 
 class HealthAssessmentPromptPage extends StatefulWidget {
   final String mineName;
@@ -32,6 +40,30 @@ class _HealthAssessmentPromptPageState
   bool _zoneWasAutoSelected = false;
   final Set<String> _selectedModes = {};
 
+  final AqmDataSource _aqmDataSource = MockAqmDataSource();
+  bool _isFetchingAqm = false;
+  String? _aqmFetchError;
+  AqmReading? _lastAqmReading;
+  final List<String> _aqmAutoFields = [
+    'PM2.5 (µg/m³)',
+    'CO (ppm)',
+    'CO2 (ppm)',
+    'H2S (ppm)',
+    'Methane (%)',
+    'Temperature (°C)',
+    'Humidity (%)',
+    'Noise (dB)',
+  ];
+  final List<String> _aqmManualFields = [];
+
+  final DroneAnalysisDataSource _droneDataSource = DroneRemoteAnalysisDataSource();
+  final ImagePicker _imagePicker = ImagePicker();
+  Uint8List? _droneImageBytes;
+  bool _isAnalyzingDrone = false;
+  String? _droneAnalysisError;
+  DroneAnalysisResult? _lastDroneResult;
+
+
   final Map<String, TextEditingController> _aqmControllers = {};
   final Map<String, TextEditingController> _droneControllers = {};
   final TextEditingController _notesController = TextEditingController();
@@ -52,8 +84,8 @@ class _HealthAssessmentPromptPageState
     'Loading Point',
   ];
 
-  final List<String> _aqmFields = ['PM2.5 (µg/m³)', 'CO (ppm)', 'Dust Level (mg/m³)'];
-  final List<String> _droneFields = ['Thermal Flag', 'PPE Compliance', 'Observation'];
+  List<String> get _aqmFields => [..._aqmAutoFields, ..._aqmManualFields];
+  final List<String> _droneFields = ['PPE Compliance (%)', 'Hazard Tags'];
 
   final List<Map<String, dynamic>> _modes = [
     {'label': 'AQM Reading', 'value': 'AQM', 'icon': Icons.air_rounded},
@@ -104,6 +136,98 @@ class _HealthAssessmentPromptPageState
     });
   }
 
+  Future<void> _fetchAqmReading() async {
+    setState(() {
+      _isFetchingAqm = true;
+      _aqmFetchError = null;
+    });
+
+    try {
+      final reading = await _aqmDataSource.fetchLatestReading();
+      setState(() {
+        _aqmController('PM2.5 (µg/m³)').text = reading.pm25.toStringAsFixed(1);
+        _aqmController('CO (ppm)').text = reading.co.toStringAsFixed(2);
+        _aqmController('CO2 (ppm)').text = reading.co2.toStringAsFixed(0);
+        _aqmController('H2S (ppm)').text = reading.h2s.toStringAsFixed(3);
+        _aqmController('Methane (%)').text = reading.methane.toStringAsFixed(3);
+        _aqmController('Temperature (°C)').text = reading.temperature.toStringAsFixed(1);
+        _aqmController('Humidity (%)').text = reading.humidity.toStringAsFixed(0);
+        _aqmController('Noise (dB)').text = reading.noise.toString();
+        _lastAqmReading = reading;
+        _isFetchingAqm = false;
+      });
+    } on AqmFetchException catch (e) {
+      setState(() {
+        _aqmFetchError = e.message;
+        _isFetchingAqm = false;
+      });
+    } catch (e) {
+      setState(() {
+        _aqmFetchError = 'Something went wrong. Please retry.';
+        _isFetchingAqm = false;
+      });
+    }
+  }
+
+  String _formatTimeAgo(DateTime time) {
+    final diff = DateTime.now().difference(time);
+    if (diff.inSeconds < 60) return '${diff.inSeconds}s ago';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    return '${diff.inHours}h ago';
+  }
+
+    Future<void> _pickDroneImage() async {
+    final picked = await _imagePicker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+    if (picked == null) return;
+
+    final bytes = await picked.readAsBytes();
+
+    setState(() {
+      _droneImageBytes = bytes;
+      _droneAnalysisError = null;
+    });
+
+    await _analyzeDroneImage(bytes);
+  }
+
+  Future<void> _analyzeDroneImage(Uint8List imageBytes) async {
+    setState(() {
+      _isAnalyzingDrone = true;
+      _droneAnalysisError = null;
+    });
+
+    try {
+      final result = await _droneDataSource.analyzeImage(imageBytes);
+      setState(() {
+        _droneController('PPE Compliance (%)').text = result.ppeCompliancePercent.toStringAsFixed(0);
+        _droneController('Hazard Tags').text = result.hazardTags.join(', ');
+        _lastDroneResult = result;
+        _isAnalyzingDrone = false;
+      });
+    } on DroneAnalysisException catch (e) {
+      setState(() {
+        _droneAnalysisError = e.message;
+        _isAnalyzingDrone = false;
+      });
+    } catch (e) {
+      setState(() {
+        _droneAnalysisError = 'Analysis failed. Please retry.';
+        _isAnalyzingDrone = false;
+      });
+    }
+  }
+
+  bool _isDroneFieldFlagged(String label, String value) {
+    if (label == 'PPE Compliance (%)') {
+      final v = double.tryParse(value);
+      return v != null && v < HealthThresholds.minPpeCompliancePercent;
+    }
+    if (label == 'Hazard Tags') {
+      return value.trim().isNotEmpty;
+    }
+    return false;
+  }
+
   void _removeWorker(String id) {
     setState(() {
       _workerIds.remove(id);
@@ -146,10 +270,24 @@ class _HealthAssessmentPromptPageState
   bool _isAqmFieldFlagged(String label, String value) {
     final v = double.tryParse(value);
     if (v == null) return false;
-    if (label == 'PM2.5 (µg/m³)') return v > HealthThresholds.maxPm25;
-    if (label == 'CO (ppm)') return v > HealthThresholds.maxCo;
-    if (label == 'Dust Level (mg/m³)') return v > HealthThresholds.maxDust;
-    return false;
+    switch (label) {
+      case 'PM2.5 (µg/m³)':
+        return v > HealthThresholds.maxPm25;
+      case 'CO (ppm)':
+        return v > HealthThresholds.maxCo;
+      case 'CO2 (ppm)':
+        return v > HealthThresholds.maxCo2;
+      case 'H2S (ppm)':
+        return v > HealthThresholds.maxH2s;
+      case 'Methane (%)':
+        return v > HealthThresholds.maxMethane;
+      case 'Temperature (°C)':
+        return v > HealthThresholds.maxTemperature;
+      case 'Noise (dB)':
+        return v > HealthThresholds.maxNoise;
+      default:
+        return false; // Humidity has no standalone threshold — contextual only
+    }
   }
 
   int get _liveFlagCount {
@@ -162,6 +300,10 @@ class _HealthAssessmentPromptPageState
     for (final field in _aqmFields) {
       final value = _aqmController(field).text;
       if (_isAqmFieldFlagged(field, value)) count++;
+    }
+     for (final field in _droneFields) {
+      final value = _droneController(field).text;
+      if (_isDroneFieldFlagged(field, value)) count++;
     }
     return count;
   }
@@ -244,7 +386,7 @@ class _HealthAssessmentPromptPageState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('🩺 Worker Health Assessment',
+                Text('🩺 Worker Health & Safety Assessment',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                 Text('Optional — before checklist',
                     style: TextStyle(fontSize: 11, color: Colors.white60)),
@@ -528,7 +670,7 @@ class _HealthAssessmentPromptPageState
     );
   }
 
-  Widget _buildAqmCard() {
+Widget _buildAqmCard() {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -548,18 +690,83 @@ class _HealthAssessmentPromptPageState
             ],
           ),
           const SizedBox(height: 12),
-          ..._aqmFields.map((field) => _flaggableField(
+
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: _isFetchingAqm ? null : _fetchAqmReading,
+              icon: _isFetchingAqm
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: _headerColor),
+                    )
+                  : const Icon(Icons.sensors_rounded, size: 18, color: _headerColor),
+              label: Text(
+                _isFetchingAqm
+                    ? 'Fetching...'
+                    : (_lastAqmReading == null ? 'Fetch AQM Reading' : 'Refresh AQM Reading'),
+                style: const TextStyle(color: _headerColor, fontWeight: FontWeight.w600),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: _headerColor),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+          ),
+
+          if (_lastAqmReading != null && !_isFetchingAqm) ...[
+            const SizedBox(height: 6),
+            Text(
+              'Last fetched ${_formatTimeAgo(_lastAqmReading!.fetchedAt)}',
+              style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+            ),
+          ],
+
+          if (_aqmFetchError != null) ...[
+            const SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: _flagBg,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: _flagColor.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.error_outline_rounded, color: _flagColor, size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(_aqmFetchError!,
+                        style: const TextStyle(fontSize: 12, color: _flagColor, fontWeight: FontWeight.w600)),
+                  ),
+                  TextButton(
+                    onPressed: _fetchAqmReading,
+                    style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero),
+                    child: const Text('Retry', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _flagColor)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          const SizedBox(height: 14),
+
+          ..._aqmAutoFields.map((field) => _flaggableField(
                 controller: _aqmController(field),
                 label: field,
                 isFlagged: () => _isAqmFieldFlagged(field, _aqmController(field).text),
                 flagMessage: 'Above safe limit',
+                readOnly: true,
               )),
         ],
       ),
     );
   }
 
-  Widget _buildDroneCard() {
+    Widget _buildDroneCard() {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -579,21 +786,88 @@ class _HealthAssessmentPromptPageState
             ],
           ),
           const SizedBox(height: 12),
-          ..._droneFields.map((field) => Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: TextField(
-                  controller: _droneController(field),
-                  onChanged: (_) => setState(() {}),
-                  decoration: InputDecoration(
-                    labelText: field,
-                    isDense: true,
-                    filled: true,
-                    fillColor: const Color(0xFFF5F7FA),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+
+          if (_droneImageBytes != null) ...[
+            _lastDroneResult != null
+                ? AnnotatedImage(imageBytes: _droneImageBytes!, result: _lastDroneResult!)
+                : ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.memory(_droneImageBytes!, height: 160, width: double.infinity, fit: BoxFit.cover),
                   ),
-                ),
-              )),
+            const SizedBox(height: 10),
+          ],
+
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: _isAnalyzingDrone ? null : _pickDroneImage,
+              icon: _isAnalyzingDrone
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: _headerColor),
+                    )
+                  : Icon(_droneImageBytes == null ? Icons.upload_rounded : Icons.refresh_rounded, size: 18, color: _headerColor),
+              label: Text(
+                _isAnalyzingDrone
+                    ? 'Analyzing...'
+                    : (_droneImageBytes == null ? 'Attach Drone Photo' : 'Replace Photo'),
+                style: const TextStyle(color: _headerColor, fontWeight: FontWeight.w600),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: _headerColor),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+          ),
+
+          if (_lastDroneResult != null && !_isAnalyzingDrone) ...[
+            const SizedBox(height: 6),
+            Text(
+              'Analyzed ${_formatTimeAgo(_lastDroneResult!.analyzedAt)} · Confidence ${(_lastDroneResult!.confidenceScore * 100).toStringAsFixed(0)}%',
+              style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+            ),
+          ],
+
+          if (_droneAnalysisError != null) ...[
+            const SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: _flagBg,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: _flagColor.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.error_outline_rounded, color: _flagColor, size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(_droneAnalysisError!,
+                        style: const TextStyle(fontSize: 12, color: _flagColor, fontWeight: FontWeight.w600)),
+                  ),
+                  TextButton(
+                    onPressed: () => _droneImageBytes != null ? _analyzeDroneImage(_droneImageBytes!) : null,
+                    style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero),
+                    child: const Text('Retry', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _flagColor)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          if (_lastDroneResult != null) ...[
+            const SizedBox(height: 14),
+            ..._droneFields.map((field) => _flaggableField(
+                  controller: _droneController(field),
+                  label: field,
+                  isFlagged: () => _isDroneFieldFlagged(field, _droneController(field).text),
+                  flagMessage: field == 'PPE Compliance (%)' ? 'Below safe compliance level' : 'Hazard detected',
+                  readOnly: true,
+                )),
+          ],
         ],
       ),
     );
@@ -696,11 +970,12 @@ class _HealthAssessmentPromptPageState
     );
   }
 
-  Widget _flaggableField({
+Widget _flaggableField({
     required TextEditingController controller,
     required String label,
     required bool Function() isFlagged,
     required String flagMessage,
+    bool readOnly = false,
   }) {
     final flagged = isFlagged();
     return Padding(
@@ -710,13 +985,19 @@ class _HealthAssessmentPromptPageState
         children: [
           TextField(
             controller: controller,
+            readOnly: readOnly,
             keyboardType: TextInputType.number,
-            onChanged: (_) => setState(() {}),
+            onChanged: readOnly ? null : (_) => setState(() {}),
             decoration: InputDecoration(
               labelText: label,
               isDense: true,
               filled: true,
-              fillColor: flagged ? _flagBg : const Color(0xFFF5F7FA),
+              fillColor: flagged
+                  ? _flagBg
+                  : (readOnly ? const Color(0xFFEFF4FA) : const Color(0xFFF5F7FA)),
+              suffixIcon: flagged
+                  ? const Icon(Icons.warning_amber_rounded, color: _flagColor, size: 20)
+                  : (readOnly ? const Icon(Icons.sensors_rounded, color: _headerColor, size: 18) : null),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: flagged ? const BorderSide(color: _flagColor, width: 1.4) : BorderSide.none,
@@ -726,7 +1007,6 @@ class _HealthAssessmentPromptPageState
                 borderSide: flagged ? const BorderSide(color: _flagColor, width: 1.4) : BorderSide.none,
               ),
               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              suffixIcon: flagged ? const Icon(Icons.warning_amber_rounded, color: _flagColor, size: 20) : null,
             ),
           ),
           if (flagged) ...[

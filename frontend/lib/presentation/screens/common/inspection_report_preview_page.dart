@@ -315,7 +315,7 @@ class _InspectionReportPreviewPageState
           ),
           pw.SizedBox(height: 20),
 
-          // Worker Health Assessment
+          // Worker Health & Safety Assessment
           if (widget.healthAssessment != null) ...[
             _pdfHealthAssessmentSection(widget.healthAssessment!),
             pw.SizedBox(height: 20),
